@@ -1,94 +1,59 @@
-# 10x Astro Starter
+# 10x-hymns
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+## Project Description
+10x-hymns is a modern web application that offers a dynamic platform for managing and delivering liturgical hymn sets. By leveraging cutting-edge web technologies, it ensures high performance, enhanced accessibility, and a seamless user experience.
 
 ## Tech Stack
+- **Astro 5:** Fast static site generation and hybrid rendering.
+- **TypeScript 5:** Modern type safety for scalable code.
+- **React 19:** Dynamic user interfaces.
+- **Tailwind CSS 4:** Utility-first CSS framework for efficient styling.
+- **Shadcn/ui:** Component library for polished UI designs.
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+## Getting Started Locally
 
-## Prerequisites
+### Prerequisites
+- Node.js (refer to the version specified in the `.nvmrc` file)
+- npm (or yarn)
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
-
-## Getting Started
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+### Installation
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/kkempa-fp/10x-hymns.git
+   ```
+2. **Navigate to the project directory:**
+   ```bash
+   cd 10x-hymns
+   ```
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+4. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
 ## Available Scripts
+- **`npm run dev`** — Starts the Astro development server.
+- **`npm run build`** — Builds the project for production.
+- **`npm run preview`** — Serves the production build locally.
+- **`npm run astro`** — Runs Astro CLI commands.
+- **`npm run lint`** — Runs ESLint to check for linting issues.
+- **`npm run lint:fix`** — Automatically fixes linting issues.
+- **`npm run format`** — Formats the codebase with Prettier.
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+## Project Scope
+Key features include:
+- **Static Hymn Collection:** A predefined database of hymns stored with vector embeddings for semantic search.
+- **Automatic Hymn Set Generation:** Integration with LLM-based models to analyze liturgical text, automatically segment it (e.g., entrance, preparation of gifts, communion, exaltation, conclusion), and generate hymn suggestions.
+- **Manual Hymn Set Creation:** A user-friendly interface to manually craft, edit, and manage hymn sets with validation to prevent duplicate entries.
+- **Hymn Set Regeneration:** Capability to regenerate hymn sets ensuring a variety of options for the same liturgical text.
+- **User Account Management:** Secure registration, login, and account deletion functionalities to protect user data and personalize hymn management experience.
+- **Usage Metrics:** Collection of statistics on AI-generated hymn sets and their acceptance rates, providing insights into system performance and user preferences.
 
-## Project Structure
-
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
-
-## AI Development Support
-
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
-
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
-
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+## Project Status
+The project is currently in the MVP stage and under active development.
 
 ## License
-
-MIT
+This project is licensed under the MIT License.
