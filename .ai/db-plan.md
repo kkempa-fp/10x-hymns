@@ -1,6 +1,6 @@
 1. Lista tabel z ich kolumnami, typami danych i ograniczeniami
 
- - **hymns**
+- **hymns**
   - `id` uuid primary key default gen_random_uuid()
   - `number` varchar(10) not null unique
   - `category` varchar(100) not null
