@@ -1,6 +1,6 @@
 # Schemat bazy danych - 10x-hymns
 
-## 1. Lista tabel z ich kolumnami, typami danych i ograniczeniami
+## 1. Lista tabel
 
 ### hymns
   - `id` uuid primary key default gen_random_uuid()
@@ -47,7 +47,7 @@
 - `CREATE INDEX sets_name_trgm_idx ON public.sets USING gin (name gin_trgm_ops);`
 - `CREATE INDEX ratings_user_idx ON public.ratings (user_id);`
 
-## 4. Zasady PostgreSQL (jeśli dotyczy)
+## 4. Zasady PostgreSQL
 
 - `ALTER TABLE public.sets ENABLE ROW LEVEL SECURITY;`
     - `CREATE POLICY sets_select_own ON public.sets FOR SELECT USING (auth.uid() = user_id);`
@@ -62,7 +62,7 @@
 
 - `ALTER TABLE public.hymns DISABLE ROW LEVEL SECURITY;` (tabela publiczna tylko do odczytu).
 
-## 5. Wszelkie dodatkowe uwagi lub wyjaśnienia dotyczące decyzji projektowych
+## 5. Dodatkowe uwagi
 
 - Wymagane rozszerzenia: `CREATE EXTENSION IF NOT EXISTS pgvector;`, `CREATE EXTENSION IF NOT EXISTS pg_trgm;`, `CREATE EXTENSION IF NOT EXISTS pgcrypto;` (dla `gen_random_uuid()`).
 - Trigger automatycznie aktualizujący `sets.updated_at` (prosty wariant ustawiający zawsze now()):
