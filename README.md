@@ -1,9 +1,11 @@
 # 10x-hymns
 
 ## Project Description
+
 10x-hymns is an intelligent web application designed to simplify and accelerate the process of selecting hymns for the liturgy of the Holy Mass. By analyzing liturgical text fragments (e.g., antiphons, readings) provided by the user, the application suggests suitable hymns using vector embeddings. It aims to solve the time-consuming problem faced by organists, priests, and music ministers of manually searching for thematically appropriate hymns. The application is a responsive Single Page Application (SPA), ensuring a seamless user experience across various devices.
 
 ## Table of Contents
+
 - [Project Description](#project-description)
 - [Tech Stack](#tech-stack)
 - [Getting Started Locally](#getting-started-locally)
@@ -13,11 +15,21 @@
 - [License](#license)
 
 ## Tech Stack
-- **Astro 5:** Fast static site generation and hybrid rendering.
-- **TypeScript 5:** Modern type safety for scalable code.
-- **React 19:** Dynamic user interfaces.
-- **Tailwind CSS 4:** Utility-first CSS framework for efficient styling.
-- **Shadcn/ui:** Component library for polished UI designs.
+
+**Frontend:**
+- Astro 5
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- Shadcn/ui
+
+**Backend:**
+- Supabase (PostgreSQL) for data storage and authentication
+- AI integration via OpenRouter.ai API
+
+**CI/CD / Deployment:**
+- GitHub Actions for continuous integration and deployment
+- DigitalOcean for hosting using Docker images
 
 ## Getting Started Locally
 
@@ -44,6 +56,7 @@
    ```
 
 ## Available Scripts
+
 - **`npm run dev`** — Starts the Astro development server.
 - **`npm run build`** — Builds the project for production.
 - **`npm run preview`** — Serves the production build locally.
@@ -53,6 +66,7 @@
 - **`npm run format`** — Formats the codebase with Prettier.
 
 ## Project Scope
+
 Key features include:
 - **AI-Powered Hymn Suggestions:** Users can paste liturgical text to receive a list of hymn suggestions based on semantic similarity, calculated using vector embeddings.
 - **Static Hymn Database:** A non-modifiable collection of hymns, each containing a title, number, category, and a pre-calculated embedding vector.
@@ -63,7 +77,9 @@ Key features include:
 - **Suggestion Rating System:** A feedback mechanism (thumbs up/down) for users to rate the quality of hymn suggestions, helping to measure the system's effectiveness.
 
 ## Project Status
+
 The project is currently in the MVP stage and under active development.
 
 ## License
+
 This project is licensed under the MIT License.
