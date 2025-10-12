@@ -47,7 +47,7 @@
 - `CREATE INDEX sets_name_trgm_idx ON public.sets USING gin (name gin_trgm_ops);`
 - `CREATE INDEX ratings_user_idx ON public.ratings (user_id);`
 
-## 4. Zasady PostgreSQL
+## 4. Zasady RLS (Row-Level Security)
 
 - `ALTER TABLE public.sets ENABLE ROW LEVEL SECURITY;`
     - `CREATE POLICY sets_select_own ON public.sets FOR SELECT USING (auth.uid() = user_id);`
@@ -60,7 +60,7 @@
     - `CREATE POLICY ratings_owner_select_update ON public.ratings FOR SELECT USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);`
     - `CREATE POLICY ratings_owner_delete ON public.ratings FOR DELETE USING (auth.uid() = user_id);`
 
-- `ALTER TABLE public.hymns DISABLE ROW LEVEL SECURITY;` (tabela publiczna tylko do odczytu).
+- `ALTER TABLE public.hymns DISABLE ROW LEVEL SECURITY;` (tabela publiczna tylko do odczytu)
 
 ## 5. Dodatkowe uwagi
 
