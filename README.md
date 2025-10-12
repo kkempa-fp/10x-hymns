@@ -3,6 +3,15 @@
 ## Project Description
 10x-hymns is an intelligent web application designed to simplify and accelerate the process of selecting hymns for the liturgy of the Holy Mass. By analyzing liturgical text fragments (e.g., antiphons, readings) provided by the user, the application suggests suitable hymns using vector embeddings. It aims to solve the time-consuming problem faced by organists, priests, and music ministers of manually searching for thematically appropriate hymns. The application is a responsive Single Page Application (SPA), ensuring a seamless user experience across various devices.
 
+## Table of Contents
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
+
 ## Tech Stack
 - **Astro 5:** Fast static site generation and hybrid rendering.
 - **TypeScript 5:** Modern type safety for scalable code.
