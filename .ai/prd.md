@@ -1,39 +1,43 @@
 # Dokument wymagań produktu (PRD) - 10x-hymns
 
 ## 1. Przegląd produktu
+
 Aplikacja "10x-hymns" to inteligentne narzędzie webowe zaprojektowane w celu uproszczenia i przyspieszenia procesu doboru pieśni do liturgii mszy świętej. Aplikacja, działająca jako Single Page Application (SPA), analizuje wprowadzony przez użytkownika fragment tekstu liturgicznego (np. antyfony, czytania) i na jego podstawie proponuje pasujące pieśni, wykorzystując do tego celu wektory embeddingu. Użytkownicy mogą tworzyć konta, aby zapisywać, przeglądać i zarządzać własnymi zestawami pieśni na poszczególne dni w ciągu roku liturgicznego. Interfejs aplikacji jest w pełni responsywny (RWD), zapewniając komfort użytkowania na różnych urządzeniach.
 
 ## 2. Problem użytkownika
+
 Dobór odpowiednich pieśni, które tematycznie i treściowo współgrają z liturgią danego dnia, jest zadaniem czasochłonnym i wymagającym dla organistów, księży i osób odpowiedzialnych za oprawę muzyczną mszy świętej. Proces ten często polega na manualnym przeszukiwaniu śpiewników i dopasowywaniu treści, co jest nieefektywne. Aplikacja ma na celu rozwiązanie tego problemu, oferując szybkie i trafne propozycje pieśni, co znacząco skraca czas przygotowań.
 
 ## 3. Wymagania funkcjonalne
--   3.1. Uwierzytelnianie użytkowników:
-    -   Rejestracja nowego konta użytkownika.
-    -   Logowanie do istniejącego konta.
--   3.2. Baza pieśni:
-    -   Statyczna, niemodyfikowalna przez użytkownika baza pieśni.
-    -   Każda pieśń zawiera: numer, tytuł, kategorię oraz pre-obliczony wektor embeddingu.
--   3.3. Generator propozycji pieśni (AI):
-    -   Jedno pole tekstowe do wklejenia przez użytkownika fragmentu tekstu liturgii.
-    -   Obliczanie embeddingu dla wprowadzonego tekstu po stronie serwera.
-    -   Wyszukiwanie i wyświetlanie N (domyślnie 3, konfigurowalne po stronie serwera) pieśni o najbliższych wektorach.
--   3.4. System ocen propozycji:
-    -   Możliwość oceny listy zaproponowanych pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół".
-    -   Oceny są zapisywane w bazie danych (anonimowo lub z ID zalogowanego użytkownika).
--   3.5. Zarządzanie zestawami pieśni (dla zalogowanych użytkowników):
-    -   Tworzenie nowego zestawu z unikalną, wymuszoną przez system nazwą.
-    -   Zestaw składa się z 5 dedykowanych pól tekstowych: Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie.
-    -   Przeglądanie listy zapisanych zestawów.
-    -   Wyszukiwanie zestawów po nazwie (case-insensitive, typu "contains").
-    -   Edycja nazwy i zawartości istniejącego zestawu.
-    -   Usuwanie zapisanego zestawu.
--   3.6. Interfejs użytkownika (UI):
-    -   Aplikacja jednostronicowa (SPA).
-    -   Design responsywny (RWD).
-    -   Dla użytkowników niezalogowanych strona główna pełni rolę generatora propozycji.
-    -   Dla użytkowników zalogowanych na tym samym ekranie widoczny jest dodatkowo panel do zarządzania zestawami.
+
+1. Uwierzytelnianie użytkowników:
+   - Rejestracja nowego konta użytkownika.
+   - Logowanie do istniejącego konta.
+2. Baza pieśni:
+   - Statyczna, niemodyfikowalna przez użytkownika baza pieśni.
+   - Każda pieśń zawiera: numer, tytuł, kategorię oraz pre-obliczony wektor embeddingu.
+3. Generator propozycji pieśni (AI):
+   - Jedno pole tekstowe do wklejenia przez użytkownika fragmentu tekstu liturgii.
+   - Obliczanie embeddingu dla wprowadzonego tekstu po stronie serwera.
+   - Wyszukiwanie i wyświetlanie N (domyślnie 3, konfigurowalne po stronie serwera) pieśni o najbliższych wektorach.
+4. System ocen propozycji:
+   - Możliwość oceny listy zaproponowanych pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół".
+   - Oceny są zapisywane w bazie danych (anonimowo lub z ID zalogowanego użytkownika).
+5. Zarządzanie zestawami pieśni (dla zalogowanych użytkowników):
+   - Tworzenie nowego zestawu z unikalną, wymuszoną przez system nazwą.
+   - Zestaw składa się z 5 dedykowanych pól tekstowych: Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie.
+   - Przeglądanie listy zapisanych zestawów.
+   - Wyszukiwanie zestawów po nazwie (case-insensitive, typu "contains").
+   - Edycja nazwy i zawartości istniejącego zestawu.
+   - Usuwanie zapisanego zestawu.
+6. Interfejs użytkownika (UI):
+   - Aplikacja jednostronicowa (SPA).
+   - Design responsywny (RWD).
+   - Dla użytkowników niezalogowanych strona główna pełni rolę generatora propozycji.
+   - Dla użytkowników zalogowanych na tym samym ekranie widoczny jest dodatkowo panel do zarządzania zestawami.
 
 ## 4. Granice produktu
+
 W zakres wersji MVP produktu NIE wchodzą następujące funkcjonalności:
 -   Zarządzanie statycznym zbiorem pieśni przez użytkowników (dodawanie, edycja, usuwanie pieśni z głównej bazy).
 -   Import tekstów liturgii z plików w formatach zewnętrznych (np. PDF, DOCX).
@@ -116,6 +120,7 @@ Kryteria akceptacji:
 - Po potwierdzeniu, zestaw jest trwale usuwany z bazy danych i znika z listy.
 
 ## 6. Metryki sukcesu
+
 -   Główne kryterium sukcesu: 75% pieśni proponowanych przez aplikację jest akceptowane przez użytkownika.
 -   Sposób mierzenia: Sukces będzie mierzony jako stosunek liczby ocen "łapka w górę" do całkowitej liczby oddanych ocen ("łapka w górę" + "łapka w dół").
     -   Formuła: `Wskaźnik akceptacji = Liczba_ocen_pozytywnych / (Liczba_ocen_pozytywnych + Liczba_ocen_negatywnych)`
