@@ -1,136 +1,122 @@
 # Dokument wymagań produktu (PRD) - 10x-hymns
 
 ## 1. Przegląd produktu
-
-Aplikacja 10x-hymns jest przeznaczona do tworzenia i zarządzania zestawami pieśni na poszczególne części mszy świętej. System korzysta z modeli LLM (poprzez API) do generowania sugestii pieśni na podstawie wprowadzonego tekstu liturgii. W ramach MVP wykorzystywany jest statyczny zbiór pieśni oraz prosty system kont użytkowników zapewniający bezpieczny dostęp do danych.
+Aplikacja "10x-hymns" to inteligentne narzędzie webowe zaprojektowane w celu uproszczenia i przyspieszenia procesu doboru pieśni do liturgii mszy świętej. Aplikacja, działająca jako Single Page Application (SPA), analizuje wprowadzony przez użytkownika fragment tekstu liturgicznego (np. antyfony, czytania) i na jego podstawie proponuje pasujące pieśni, wykorzystując do tego celu wektory embeddingu. Użytkownicy mogą tworzyć konta, aby zapisywać, przeglądać i zarządzać własnymi zestawami pieśni na poszczególne dni w ciągu roku liturgicznego. Interfejs aplikacji jest w pełni responsywny (RWD), zapewniając komfort użytkowania na różnych urządzeniach.
 
 ## 2. Problem użytkownika
-
-Organista, odpowiedzialny za przygotowanie liturgii, musi ręcznie komponować zestawy pieśni, co jest procesem czasochłonnym i podatnym na błędy. Brak efektywnego narzędzia do generowania i zarządzania zestawami pieśni może skutkować opóźnieniami, niską jakością przygotowanej liturgii oraz zniechęceniem użytkowników do korzystania z tradycyjnych metod.
+Dobór odpowiednich pieśni, które tematycznie i treściowo współgrają z liturgią danego dnia, jest zadaniem czasochłonnym i wymagającym dla organistów, księży i osób odpowiedzialnych za oprawę muzyczną mszy świętej. Proces ten często polega na manualnym przeszukiwaniu śpiewników i dopasowywaniu treści, co jest nieefektywne. Aplikacja ma na celu rozwiązanie tego problemu, oferując szybkie i trafne propozycje pieśni, co znacząco skraca czas przygotowań.
 
 ## 3. Wymagania funkcjonalne
-
-1. Przechowywanie stałego zbioru pieśni:
-   - Statyczny zbiór dostępny w systemie.
-   - Pieśni zapisane w formacie wektorowym (embedding) w bazie danych.
-
-2. Automatyczne generowanie zestawów pieśni:
-   - Użytkownik wkleja tekst liturgii (np. ze strony brewiarz.pl).
-   - Aplikacja dzieli tekst na segmenty odpowiadające częściom mszy świętej (wejście, przygotowanie darów, komunia, uwielbienie, zakończenie).
-   - Aplikacja generuje embedding dla poszczególnych segmentów.
-   - Aplikacja wyszukuje w bazie danych pieśni najbardziej podobne semantycznie do segmentów liturgii.
-   - Model LLM proponuje zestaw pieśni na podstawie wyszukiwania w bazie danych.
-   - Zestaw pieśni jest prezentowany użytkownikowi z możliwością akceptacji, edycji lub odrzucenia.
-
-3. Ręczne tworzenie zestawów pieśni:
-   - Formularz do ręcznego tworzenia zestawów pieśni (nazwa i zestaw).
-   - Opcje edycji i usuwania istniejących zestawów pieśni.
-   - Ręczne tworzenie zestawów pieśni i wyświetlanie w ramach widoku listy "Moje zestawy".
-
-4. Walidacja zestawu pieśni:
-   - Zapobieganie umieszczaniu w zestawie tej samej pieśni więcej niż jeden raz.
-
-5. Regeneracja zestawu pieśni:
-   - Możliwość wygenerowania nowego zestawu pieśni na podstawie wprowadzonego tekstu liturgii z gwarancją zwrócenia innego wyniku.
-
-6. Implementacja prostego systemu kont użytkowników:
-   - Rejestracja i logowanie.
-   - Możliwość usunięcia konta i powiązanych zestawów pieśni na życzenie.
-
-7. Statystyki generowania zestawów pieśni:
-   - Zbieranie informacji o tym, ile zestawów pieśni zostało wygenerowanych przez AI i ile z nich ostatecznie zaakceptowano.
+-   3.1. Uwierzytelnianie użytkowników:
+    -   Rejestracja nowego konta użytkownika.
+    -   Logowanie do istniejącego konta.
+-   3.2. Baza pieśni:
+    -   Statyczna, niemodyfikowalna przez użytkownika baza pieśni.
+    -   Każda pieśń zawiera: numer, tytuł, kategorię oraz pre-obliczony wektor embeddingu.
+-   3.3. Generator propozycji pieśni (AI):
+    -   Jedno pole tekstowe do wklejenia przez użytkownika fragmentu tekstu liturgii.
+    -   Obliczanie embeddingu dla wprowadzonego tekstu po stronie serwera.
+    -   Wyszukiwanie i wyświetlanie N (domyślnie 3, konfigurowalne po stronie serwera) pieśni o najbliższych wektorach.
+-   3.4. System ocen propozycji:
+    -   Możliwość oceny listy zaproponowanych pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół".
+    -   Oceny są zapisywane w bazie danych (anonimowo lub z ID zalogowanego użytkownika).
+-   3.5. Zarządzanie zestawami pieśni (dla zalogowanych użytkowników):
+    -   Tworzenie nowego zestawu z unikalną, wymuszoną przez system nazwą.
+    -   Zestaw składa się z 5 dedykowanych pól tekstowych: Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie.
+    -   Przeglądanie listy zapisanych zestawów.
+    -   Wyszukiwanie zestawów po nazwie (case-insensitive, typu "contains").
+    -   Edycja nazwy i zawartości istniejącego zestawu.
+    -   Usuwanie zapisanego zestawu.
+-   3.6. Interfejs użytkownika (UI):
+    -   Aplikacja jednostronicowa (SPA).
+    -   Design responsywny (RWD).
+    -   Dla użytkowników niezalogowanych strona główna pełni rolę generatora propozycji.
+    -   Dla użytkowników zalogowanych na tym samym ekranie widoczny jest dodatkowo panel do zarządzania zestawami.
 
 ## 4. Granice produktu
-
-1. Poza zakresem MVP:
-   - Zarządzania zbiorem pieśni poza statycznym, predefiniowanym zestawem.
-   - Importowanie plików w formatach PDF, DOCX czy innych.
-   - Współdzielenie zestawów pieśni między użytkownikami.
-   - Aplikacje mobilne (obecnie tylko wersja web).
-   - Publicznie dostępne API.
-   - System powiadomień.
-   - Zaawansowane wyszukiwanie zestawów pieśni po słowach kluczowych.
-   - Logowanie szczegółowych przyczyn odrzucenia.
-   - Przeprowadzanie testów użyteczności.
+W zakres wersji MVP produktu NIE wchodzą następujące funkcjonalności:
+-   Zarządzanie statycznym zbiorem pieśni przez użytkowników (dodawanie, edycja, usuwanie pieśni z głównej bazy).
+-   Import tekstów liturgii z plików w formatach zewnętrznych (np. PDF, DOCX).
+-   Współdzielenie i udostępnianie zestawów pieśni między różnymi użytkownikami.
+-   Automatyczne integracje z zewnętrznymi źródłami tekstów liturgicznych (np. brewiarz.pl, strony diecezjalne).
+-   Dedykowane aplikacje mobilne na systemy iOS i Android.
 
 ## 5. Historyjki użytkowników
 
-### US-001: Rejestracja użytkownika
-- ID: US-001
-- Tytuł: Rejestracja użytkownika
-- Opis: Jako nowy użytkownik, chcę mieć możliwość rejestracji w systemie, aby móc korzystać z pełnej funkcjonalności aplikacji.
-- Kryteria akceptacji:
-  1. Użytkownik może zarejestrować się, podając wymagane dane (email i hasło).
-  2. System tworzy nowe konto i potwierdza rejestrację.
-  3. Użytkownik otrzymuje powiadomienie o pomyślnej rejestracji.
+-   ID: US-001
+-   Tytuł: Rejestracja konta
+-   Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając swój adres e-mail i hasło, aby móc zapisywać i zarządzać moimi zestawami pieśni.
+-   Kryteria akceptacji:
+    -   Formularz rejestracji zawiera pola na adres e-mail i hasło.
+    -   System waliduje poprawność formatu adresu e-mail.
+    -   System wymusza minimalną złożoność hasła.
+    -   Po pomyślnej rejestracji użytkownik jest automatycznie zalogowany i widzi powiadomienie o sukcesie.
+    -   W przypadku próby rejestracji na istniejący już e-mail, system wyświetla czytelny komunikat o błędzie.
 
-### US-002: Logowanie użytkownika
-- ID: US-002
-- Tytuł: Logowanie użytkownika
-- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do systemu, aby uzyskać dostęp do swoich zestawów pieśni.
-- Kryteria akceptacji:
-  1. Użytkownik loguje się za pomocą poprawnych danych (email i hasło).
-  2. System weryfikuje dane i przyznaje dostęp autoryzowanym użytkownikom.
-  3. W przypadku błędnych danych, system wyświetla odpowiedni komunikat o błędzie.
+-   ID: US-002
+-   Tytuł: Logowanie do systemu
+-   Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się na moje konto przy użyciu adresu e-mail i hasła, aby uzyskać dostęp do moich zapisanych zestawów pieśni.
+-   Kryteria akceptacji:
+    -   Formularz logowania zawiera pola na adres e-mail i hasło.
+    -   Po pomyślnym zalogowaniu użytkownik zostaje przekierowany do głównego widoku aplikacji z widocznym panelem zarządzania zestawami.
+    -   W przypadku podania błędnych danych logowania, system wyświetla odpowiedni komunikat.
 
-### US-003: Automatyczne generowanie zestawu pieśni
-- ID: US-003
-- Tytuł: Automatyczne generowanie zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę wkleić tekst liturgii, aby system automatycznie podzielił go na segmenty i wygenerował zestaw pieśni, dzięki czemu oszczędzę czas potrzebny na ręczne komponowanie zestawu.
-- Kryteria akceptacji:
-  1. Użytkownik wkleja tekst liturgii.
-  2. System dzieli tekst na segmenty odpowiadające częściom mszy świętej (wejście, przygotowanie darów, komunia, uwielbienie, zakończenie).
-  3. System generuje zestaw pieśni, zapewniając unikalność każdej pieśni.
-  4. Użytkownik otrzymuje potwierdzenie wygenerowania zestawu.
+-   ID: US-003
+-   Tytuł: Generowanie propozycji pieśni
+-   Opis: Jako użytkownik (zalogowany lub nie), chcę wkleić fragment tekstu liturgicznego w pole tekstowe i kliknąć przycisk, aby otrzymać listę sugerowanych pieśni.
+-   Kryteria akceptacji:
+    -   Na stronie głównej widoczne jest duże pole tekstowe oraz przycisk "Generuj propozycje".
+    -   Po wklejeniu tekstu i kliknięciu przycisku, system wyświetla listę 3 propozycji.
+    -   Każda propozycja na liście zawiera numer i tytuł pieśni.
+    -   W przypadku braku tekstu w polu, przycisk jest nieaktywny lub system wyświetla komunikat.
 
-### US-004: Automatyczna regeneracja zestawu pieśni
-- ID: US-004
-- Tytuł: Automatyczna regeneracja zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę mieć możliwość żądania regeneracji zestawu pieśni, aby system wygenerował zupełnie inny zestaw na podstawie tego samego tekstu liturgii.
-- Kryteria akceptacji:
-  1. Użytkownik wybiera opcję regeneracji zestawu.
-  2. System generuje nowy zestaw pieśni, różniący się od poprzedniego.
-  3. Nowy zestaw spełnia kryterium unikalności (brak duplikacji pieśni).
+-   ID: US-004
+-   Tytuł: Ocenianie propozycji
+-   Opis: Jako użytkownik, chcę móc ocenić zaproponowane pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół", aby wyrazić swoją opinię o trafności sugestii.
+-   Kryteria akceptacji:
+    -   Obok listy zaproponowanych pieśni znajdują się dwa przyciski: "łapka w górę" i "łapka w dół".
+    -   Po kliknięciu jednego z przycisków, ocena jest zapisywana w systemie.
+    -   Użytkownik może oddać tylko jedną ocenę (góra lub dół) na daną propozycję w ramach jednego wyszukiwania.
+    -   Wizualne potwierdzenie oddania głosu (np. podświetlenie przycisku).
 
-### US-005: Akceptacja lub odrzucenie wygenerowanego zestawu pieśni
-- ID: US-005
-- Tytuł: Akceptacja lub odrzucenie wygenerowanego zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę mieć możliwość zarówno akceptacji, jak i odrzucenia wygenerowanego przez system zestawu pieśni, aby system mógł gromadzić statystyki dotyczące akceptacji i odrzucenia, co stanowi miernik sukcesu projektu.
-- Kryteria akceptacji:
-  1. Użytkownik przegląda wygenerowany zestaw pieśni.
-  2. Użytkownik ma możliwość wyboru między akceptacją a odrzuceniem zestawu.
-  3. W przypadku akceptacji, użytkownik wpisuje nazwę zestawu i jest on zapisywany, a system rejestruje akceptację zestawu.
-  4. W przypadku odrzucenia, zestaw nie jest zapisywany, a system rejestruje odrzucenie zestawu.
-  5. System wyświetla potwierdzenie dokonania wybranej operacji.
+-   ID: US-005
+-   Tytuł: Tworzenie nowego zestawu pieśni
+-   Opis: Jako zalogowany użytkownik, chcę móc stworzyć nowy, pusty zestaw pieśni, nadając mu unikalną nazwę, abym mógł w nim zaplanować oprawę muzyczną mszy.
+-   Kryteria akceptacji:
+    -   W panelu zarządzania zestawami znajduje się przycisk "Stwórz nowy zestaw".
+    -   Po kliknięciu pojawia się formularz z polem na nazwę zestawu oraz 5 polami tekstowymi (Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie).
+    -   System wymusza unikalność nazwy zestawu w obrębie konta użytkownika. W przypadku próby zapisu duplikatu, wyświetlany jest błąd.
+    -   Po zapisaniu, nowy zestaw pojawia się na liście moich zestawów.
 
-### US-006: Ręczne tworzenie zestawu pieśni
-- ID: US-006
-- Tytuł: Ręczne tworzenie zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę mieć możliwość ręcznego stworzenia własnego zestawu pieśni, aby móc dostosować wybór pieśni do swoich potrzeb.
-- Kryteria akceptacji:
-  1. Użytkownik może otworzyć formularz do tworzenia nowego zestawu.
-  2. Użytkownik wpisuje nazwę zestawu, a następnie ręcznie wpisuje pieśni do zestawu.
-  3. System zapisuje nowo utworzony zestaw i potwierdza operację.
+-   ID: US-006
+-   Tytuł: Przeglądanie i wyszukiwanie zestawów
+-   Opis: Jako zalogowany użytkownik, chcę widzieć listę wszystkich moich zapisanych zestawów pieśni oraz mieć możliwość ich wyszukania po nazwie, aby szybko odnaleźć interesujący mnie zestaw.
+-   Kryteria akceptacji:
+    -   Panel zarządzania domyślnie wyświetla listę wszystkich zestawów użytkownika.
+    -   Nad listą znajduje się pole wyszukiwania.
+    -   Wpisywanie tekstu w pole wyszukiwania dynamicznie filtruje listę zestawów po nazwie.
+    -   Wyszukiwanie działa na zasadzie "contains" i jest niewrażliwe na wielkość liter.
 
-### US-007: Edycja zestawu pieśni
-- ID: US-007
-- Tytuł: Edycja zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę mieć możliwość edycji istniejącego zestawu pieśni, aby wprowadzić modyfikacje bez zmiany kolejności pieśni.
-- Kryteria akceptacji:
-  1. Użytkownik wybiera opcję edycji dla konkretnego zestawu.
-  2. System umożliwia zmianę nazwy zestawu oraz poszczególnych pieśni.
-  3. Po zapisaniu, system wyświetla potwierdzenie aktualizacji.
+-   ID: US-007
+-   Tytuł: Edycja istniejącego zestawu
+-   Opis: Jako zalogowany użytkownik, chcę móc edytować istniejący zestaw pieśni, aby zmienić jego nazwę lub zawartość poszczególnych pól.
+-   Kryteria akceptacji:
+    -   Na liście zestawów, przy każdym z nich, znajduje się przycisk "Edytuj".
+    -   Po kliknięciu przycisku "Edytuj", użytkownik widzi formularz wypełniony aktualnymi danymi zestawu.
+    -   Użytkownik może modyfikować nazwę oraz zawartość 5 pól tekstowych.
+    -   Walidacja unikalności nazwy działa również podczas edycji.
+    -   Po zapisaniu zmian, zaktualizowane dane są widoczne na liście zestawów.
 
-### US-008: Usuwanie zestawu pieśni
-- ID: US-008
-- Tytuł: Usuwanie zestawu pieśni
-- Opis: Jako zalogowany użytkownik, chcę mieć możliwość usunięcia istniejącego zestawu pieśni, aby móc pozbyć się niepotrzebnych lub nieaktualnych zestawów.
-- Kryteria akceptacji:
-  1. Użytkownik wybiera opcję usunięcia dla konkretnego zestawu.
-  2. System usuwa wybrany zestaw i aktualizuje listę.
-  3. Użytkownik otrzymuje potwierdzenie usunięcia.
+-   ID: US-008
+-   Tytuł: Usuwanie zestawu
+-   Opis: Jako zalogowany użytkownik, chcę móc trwale usunąć wybrany zestaw pieśni, gdy nie jest mi już potrzebny.
+-   Kryteria akceptacji:
+    -   Na liście zestawów, przy każdym z nich, znajduje się przycisk "Usuń".
+    -   Po kliknięciu przycisku "Usuń", system wyświetla modal z prośbą o potwierdzenie operacji, aby zapobiec przypadkowemu usunięciu.
+    -   Po potwierdzeniu, zestaw jest trwale usuwany z bazy danych i znika z listy.
 
 ## 6. Metryki sukcesu
-
-1. Co najmniej 75% zestawów pieśni generowanych przez AI zostanie zaakceptowanych przez użytkowników.
-2. Co najmniej 75% wszystkich zestawów pieśni będzie tworzonych przy użyciu funkcji generowania przez AI.
+-   Główne kryterium sukcesu: 75% pieśni proponowanych przez aplikację jest akceptowane przez użytkownika.
+-   Sposób mierzenia: Sukces będzie mierzony jako stosunek liczby ocen "łapka w górę" do całkowitej liczby oddanych ocen ("łapka w górę" + "łapka w dół").
+    -   Formuła: `Wskaźnik akceptacji = Liczba_ocen_pozytywnych / (Liczba_ocen_pozytywnych + Liczba_ocen_negatywnych)`
+-   Dane będą zbierane od wszystkich użytkowników, zarówno zalogowanych, jak i niezalogowanych, w celu uzyskania jak najszerszego obrazu trafności modelu.

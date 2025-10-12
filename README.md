@@ -1,7 +1,7 @@
 # 10x-hymns
 
 ## Project Description
-10x-hymns is a modern web application that offers a dynamic platform for managing and delivering liturgical hymn sets. By leveraging cutting-edge web technologies, it ensures high performance, enhanced accessibility, and a seamless user experience.
+10x-hymns is an intelligent web application designed to simplify and accelerate the process of selecting hymns for the liturgy of the Holy Mass. By analyzing liturgical text fragments (e.g., antiphons, readings) provided by the user, the application suggests suitable hymns using vector embeddings. It aims to solve the time-consuming problem faced by organists, priests, and music ministers of manually searching for thematically appropriate hymns. The application is a responsive Single Page Application (SPA), ensuring a seamless user experience across various devices.
 
 ## Tech Stack
 - **Astro 5:** Fast static site generation and hybrid rendering.
@@ -45,12 +45,13 @@
 
 ## Project Scope
 Key features include:
-- **Static Hymn Collection:** A predefined database of hymns stored with vector embeddings for semantic search.
-- **Automatic Hymn Set Generation:** Integration with LLM-based models to analyze liturgical text, automatically segment it (e.g., entrance, preparation of gifts, communion, exaltation, conclusion), and generate hymn suggestions.
-- **Manual Hymn Set Creation:** A user-friendly interface to manually craft, edit, and manage hymn sets with validation to prevent duplicate entries.
-- **Hymn Set Regeneration:** Capability to regenerate hymn sets ensuring a variety of options for the same liturgical text.
-- **User Account Management:** Secure registration, login, and account deletion functionalities to protect user data and personalize hymn management experience.
-- **Usage Metrics:** Collection of statistics on AI-generated hymn sets and their acceptance rates, providing insights into system performance and user preferences.
+- **AI-Powered Hymn Suggestions:** Users can paste liturgical text to receive a list of hymn suggestions based on semantic similarity, calculated using vector embeddings.
+- **Static Hymn Database:** A non-modifiable collection of hymns, each containing a title, number, category, and a pre-calculated embedding vector.
+- **User Authentication:** Secure registration and login for users to access personalized features.
+- **Hymn Set Management (for authenticated users):**
+    - Create, view, search, edit, and delete custom hymn sets.
+    - Each set consists of five dedicated fields: Entrance, Offertory, Communion, Adoration, and Recessional.
+- **Suggestion Rating System:** A feedback mechanism (thumbs up/down) for users to rate the quality of hymn suggestions, helping to measure the system's effectiveness.
 
 ## Project Status
 The project is currently in the MVP stage and under active development.
