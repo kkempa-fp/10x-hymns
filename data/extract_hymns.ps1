@@ -81,7 +81,7 @@ foreach ($group in $xml.utwory.grupa) {
         $result = @()
         for ($i = 0; $i -lt $batch.Count; $i++) {
             if ($embeddings.Count -gt $i) {
-                $embedding = ($embeddings[$i].values | ForEach-Object { $_.ToString().Replace(',', '.') }) -join ","
+                $embedding = '[' + (($embeddings[$i].values | ForEach-Object { $_.ToString().Replace(',', '.') }) -join ",") + ']'
             } else {
                 $embedding = ""
             }

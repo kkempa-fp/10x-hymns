@@ -41,7 +41,7 @@ function Get-CosineSimilarity($vec1, $vec2) {
 $results = @()
 foreach ($hymn in $hymns) {
     if (-not $hymn.embedding) { continue }
-    $embeddingArr = ($hymn.embedding -split ",") | ForEach-Object { [double]$_ }
+    $embeddingArr = ($hymn.embedding.Trim('[', ']') -split ",") | ForEach-Object { [double]$_ }
     $similarity = Get-CosineSimilarity $searchEmbedding $embeddingArr
     $results += [PSCustomObject]@{
         number = $hymn.number
