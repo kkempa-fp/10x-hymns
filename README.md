@@ -17,6 +17,7 @@
 ## Tech Stack
 
 **Frontend:**
+
 - Astro 5
 - React 19
 - TypeScript 5
@@ -24,20 +25,24 @@
 - Shadcn/ui
 
 **Backend:**
+
 - Supabase (PostgreSQL) for data storage and authentication
 - AI integration via OpenRouter.ai API
 
 **CI/CD / Deployment:**
+
 - GitHub Actions for continuous integration and deployment
 - DigitalOcean for hosting using Docker images
 
 ## Getting Started Locally
 
 ### Prerequisites
+
 - Node.js (refer to the version specified in the `.nvmrc` file)
 - npm (or yarn)
 
 ### Installation
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/kkempa-fp/10x-hymns.git
@@ -68,12 +73,13 @@
 ## Project Scope
 
 Key features include:
+
 - **AI-Powered Hymn Suggestions:** Users can paste liturgical text to receive a list of hymn suggestions based on semantic similarity, calculated using vector embeddings.
 - **Static Hymn Database:** A non-modifiable collection of hymns, each containing a title, number, category, and a pre-calculated embedding vector.
 - **User Authentication:** Secure registration and login for users to access personalized features.
 - **Hymn Set Management (for authenticated users):**
-    - Create, view, search, edit, and delete custom hymn sets.
-    - Each set consists of five dedicated fields: Entrance, Offertory, Communion, Adoration, and Recessional.
+  - Create, view, search, edit, and delete custom hymn sets.
+  - Each set consists of five dedicated fields: Entrance, Offertory, Communion, Adoration, and Recessional.
 - **Suggestion Rating System:** A feedback mechanism (thumbs up/down) for users to rate the quality of hymn suggestions, helping to measure the system's effectiveness.
 
 ## Project Status
