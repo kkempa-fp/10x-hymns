@@ -1,4 +1,4 @@
-# hymn_search.ps1
+# match_hymns.ps1
 # Find top 5 most similar hymns for a custom search text using cosine similarity on embeddings.
 
 # --- CONFIGURATION ---
