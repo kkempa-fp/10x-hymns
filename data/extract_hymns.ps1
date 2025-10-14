@@ -39,12 +39,15 @@ foreach ($group in $xml.utwory.grupa) {
                 }
             }
         }
-        $text = ($verses -join ' ') -replace '\s+', ' '
+
+        # Join verses into single text, remove '- ' (word breaking) and extra spaces
+        $text = ($verses -join ' ') -replace '- ', ''
+        $text = $text -replace '\s+', ' '
         $text = $text.Trim()
 
-        # Skip hymns with empty text
+        # If hymn text is empty, set to single space
         if ($text -eq "") {
-            continue
+            $text = " "
         }
 
         # Add hymn object to list
