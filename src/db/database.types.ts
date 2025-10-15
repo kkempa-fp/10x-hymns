@@ -184,6 +184,17 @@ export interface Database {
         Args: { "": unknown };
         Returns: unknown;
       };
+      match_hymns: {
+        Args: {
+          query_embedding: number[];
+          match_count?: number;
+        };
+        Returns: {
+          number: string;
+          name: string;
+          category: string;
+        }[];
+      };
       l2_norm: {
         Args: { "": unknown } | { "": unknown };
         Returns: number;
