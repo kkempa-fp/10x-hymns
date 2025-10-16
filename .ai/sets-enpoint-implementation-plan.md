@@ -2,7 +2,7 @@
 
 ## 1. Przegląd punktu końcowego
 
-Endpoint POST `/api/sets` pozwala uwierzytelnionemu użytkownikowi stworzyć nowy zestaw pieśni. Dane zestawu (`name`, `entrance`, `offertory`, `communion`, `adoration`, `recessional`) są zapisywane w tabeli `sets` z powiązaniem do `user_id` w `auth.users`.
+Endpoint POST `/api/sets` pozwala uwierzytelnionemu użytkownikowi stworzyć nowy zestaw pieśni. Dane zestawu (`name`, `content`) są zapisywane w tabeli `sets` z powiązaniem do `user_id` w `auth.users`.
 
 ## 2. Szczegóły żądania
 
@@ -14,23 +14,15 @@ Endpoint POST `/api/sets` pozwala uwierzytelnionemu użytkownikowi stworzyć now
 - Parametry w body (JSON):
   - Wymagane:
     - `name` (string) — nazwa zestawu, niepusty ciąg
-  - Opcjonalne (lub wymagane z domyślną wartością pustego stringa):
-    - `entrance` (string)
-    - `offertory` (string)
-    - `communion` (string)
-    - `adoration` (string)
-    - `recessional` (string)
+  - Opcjonalne:
+    - `content` (string) — pole tekstowe z propozycjami pieśni (domyślnie pusty ciąg)
 
 ### Przykładowy Zod schema
 
 ```ts
 const createSetSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  entrance: z.string().optional().default(""),
-  offertory: z.string().optional().default(""),
-  communion: z.string().optional().default(""),
-  adoration: z.string().optional().default(""),
-  recessional: z.string().optional().default(""),
+  content: z.string().optional().default(""),
 });
 ```
 
@@ -38,17 +30,11 @@ const createSetSchema = z.object({
 
 - CreateSetCommand:
   ```ts
-  type CreateSetCommand = Pick<
-    SetInsert,
-    "name" | "entrance" | "offertory" | "communion" | "adoration" | "recessional"
-  >;
+  type CreateSetCommand = Pick<SetInsert, "name" | "content">;
   ```
 - SetDto:
   ```ts
-  type SetDto = Pick<
-    Set,
-    "id" | "name" | "entrance" | "offertory" | "communion" | "adoration" | "recessional" | "created_at" | "updated_at"
-  >;
+  type SetDto = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
   ```
 - CreateSetResponseDto:
   ```ts
@@ -71,11 +57,7 @@ const createSetSchema = z.object({
     "data": {
       "id": "uuid",
       "name": "string",
-      "entrance": "string",
-      "offertory": "string",
-      "communion": "string",
-      "adoration": "string",
-      "recessional": "string",
+      "content": "string",
       "created_at": "timestamptz",
       "updated_at": "timestamptz"
     }
@@ -85,20 +67,25 @@ const createSetSchema = z.object({
 ## 5. Przepływ danych
 
 1. Handler w `src/pages/api/sets.ts`:
-   - Parsowanie i walidacja body przez `createSetSchema`.
-   - Odczyt `user` z `Astro.locals` (middleware Supabase).
-   - Wywołanie serwisu.
+
+- Parsowanie i walidacja body przez `createSetSchema`.
+- Odczyt `user` z `Astro.locals` (middleware Supabase).
+- Wywołanie serwisu.
+
 2. Service (`src/lib/services/sets.service.ts`):
-   - Metoda `create(userId: string, cmd: CreateSetCommand)`:
-     1. Wywołanie Supabase client:
-        ```ts
-        const { data, error } = await supabase
-          .from("sets")
-          .insert([{ user_id: userId, ...cmd }])
-          .single();
-        ```
-     2. Obsługa błędów unikalności i propagacja.
-     3. Mapowanie `data` na `SetDto`.
+
+- Metoda `create(userId: string, cmd: CreateSetCommand)`:
+  1. Wywołanie Supabase client:
+  ```ts
+  const { data, error } = await supabase
+    .from("sets")
+    .insert([{ user_id: userId, ...cmd }])
+    .single();
+  ```
+
+  2. Obsługa błędów unikalności i propagacja.
+  3. Mapowanie `data` na `SetDto`.
+
 3. Zwrócenie obiektu `CreateSetResponseDto` w handlerze.
 
 ## 6. Względy bezpieczeństwa
@@ -124,7 +111,7 @@ const createSetSchema = z.object({
 ## 8. Rozważania dotyczące wydajności
 
 - Index na kolumnie `user_id` w tabeli `sets`.
-- Ograniczenie długości `name` (np. 200 znaków) w Zod.
+- Ograniczenie długości `name` (np. 200 znaków) oraz `content` (np. 2000 znaków) w Zod. Pole `content` jest opcjonalne i domyślnie puste.
 
 ## 9. Kroki implementacji
 

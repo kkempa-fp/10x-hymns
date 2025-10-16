@@ -7,25 +7,18 @@ import type { UpdateSetCommand } from "../../../types";
 
 const MAX_FIELD_LENGTH = 200;
 
-const optionalSetField = (label: string) =>
-  z
-    .string({ invalid_type_error: `${label} must be a string` })
-    .trim()
-    .max(MAX_FIELD_LENGTH)
-    .optional()
-    .default("");
-
 const updateSetSchema = z.object({
   name: z
     .string({ invalid_type_error: "Name must be a string" })
     .trim()
     .min(1, "Name is required")
     .max(MAX_FIELD_LENGTH, "Name cannot exceed 200 characters"),
-  entrance: optionalSetField("Entrance"),
-  offertory: optionalSetField("Offertory"),
-  communion: optionalSetField("Communion"),
-  adoration: optionalSetField("Adoration"),
-  recessional: optionalSetField("Recessional"),
+  content: z
+    .string({ invalid_type_error: "Content must be a string" })
+    .trim()
+    .max(2000, "Content cannot exceed 2000 characters")
+    .optional()
+    .default(""),
 });
 
 const jsonResponse = (body: unknown, status: number) =>
@@ -78,11 +71,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
     const parsed = updateSetSchema.parse(payload);
     command = {
       name: parsed.name,
-      entrance: parsed.entrance,
-      offertory: parsed.offertory,
-      communion: parsed.communion,
-      adoration: parsed.adoration,
-      recessional: parsed.recessional,
+      content: parsed.content,
     } satisfies UpdateSetCommand;
   } catch (parseError) {
     if (parseError instanceof SyntaxError) {

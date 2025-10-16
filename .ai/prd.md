@@ -25,7 +25,7 @@ Dobór odpowiednich pieśni, które tematycznie i treściowo współgrają z lit
    - Oceny są zapisywane w bazie danych (anonimowo lub z ID zalogowanego użytkownika).
 5. Zarządzanie zestawami pieśni (dla zalogowanych użytkowników):
    - Tworzenie nowego zestawu z unikalną, wymuszoną przez system nazwą.
-   - Zestaw składa się z 5 dedykowanych pól tekstowych: Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie.
+   - Zestaw jest polem tekstowym, do którego użytkownik wpisuje propozycje pieśni.
    - Przeglądanie listy zapisanych zestawów.
    - Wyszukiwanie zestawów po nazwie (case-insensitive, typu "contains").
    - Edycja nazwy i zawartości istniejącego zestawu.
@@ -94,7 +94,7 @@ Opis: Jako zalogowany użytkownik, chcę móc stworzyć nowy, pusty zestaw pieś
 Kryteria akceptacji:
 
 - W panelu zarządzania zestawami znajduje się przycisk "Stwórz nowy zestaw".
-- Po kliknięciu pojawia się formularz z polem na nazwę zestawu oraz 5 polami tekstowymi (Wejście, Przygotowanie darów, Komunia, Uwielbienie, Zakończenie).
+- Po kliknięciu pojawia się formularz z polem na nazwę zestawu oraz polem tekstowym na propozycje pieśni.
 - System wymusza unikalność nazwy zestawu w obrębie konta użytkownika. W przypadku próby zapisu duplikatu, wyświetlany jest błąd.
 - Po zapisaniu, nowy zestaw pojawia się na liście moich zestawów.
 
@@ -115,7 +115,7 @@ Kryteria akceptacji:
 
 - Na liście zestawów, przy każdym z nich, znajduje się przycisk "Edytuj".
 - Po kliknięciu przycisku "Edytuj", użytkownik widzi formularz wypełniony aktualnymi danymi zestawu.
-- Użytkownik może modyfikować nazwę oraz zawartość 5 pól tekstowych.
+- Użytkownik może modyfikować nazwę oraz zawartość zestawu.
 - Walidacja unikalności nazwy działa również podczas edycji.
 - Po zapisaniu zmian, zaktualizowane dane są widoczne na liście zestawów.
 

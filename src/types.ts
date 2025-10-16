@@ -11,7 +11,7 @@ export type Rating = Database["public"]["Tables"]["ratings"]["Row"];
 export type RatingInsert = Database["public"]["Tables"]["ratings"]["Insert"];
 
 // Guard command payload fields so they stay aligned with the persisted set row shape.
-type SetContentColumns = keyof Pick<Set, "name" | "entrance" | "offertory" | "communion" | "adoration" | "recessional">;
+type SetContentColumns = keyof Pick<Set, "name" | "content">;
 
 export type HymnNumber = Hymn["number"];
 
@@ -58,10 +58,7 @@ export interface ListSetsQueryDto {
   order?: "asc" | "desc";
 }
 
-export type SetDto = Pick<
-  Set,
-  "id" | "name" | "entrance" | "offertory" | "communion" | "adoration" | "recessional" | "created_at" | "updated_at"
->;
+export type SetDto = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
 
 export interface ListSetsResponseDto {
   data: SetDto[];

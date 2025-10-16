@@ -84,11 +84,7 @@ This document outlines the REST API for the 10x-hymns application, designed base
       {
         "id": "uuid",
         "name": "string",
-        "entrance": "string",
-        "offertory": "string",
-        "communion": "string",
-        "adoration": "string",
-        "recessional": "string",
+        "content": "string",
         "created_at": "timestamptz",
         "updated_at": "timestamptz"
       }
@@ -108,11 +104,7 @@ This document outlines the REST API for the 10x-hymns application, designed base
   ```json
   {
     "name": "string",
-    "entrance": "string",
-    "offertory": "string",
-    "communion": "string",
-    "adoration": "string",
-    "recessional": "string"
+    "content": "string"
   }
   ```
 - **Response Body (Success)**:
@@ -141,7 +133,8 @@ This document outlines the REST API for the 10x-hymns application, designed base
   {
     "data": {
       "id": "uuid",
-      "name": "string"
+      "name": "string",
+      "content": "string"
       // ... other fields
     }
   }
@@ -161,11 +154,7 @@ This document outlines the REST API for the 10x-hymns application, designed base
   ```json
   {
     "name": "string",
-    "entrance": "string",
-    "offertory": "string",
-    "communion": "string",
-    "adoration": "string",
-    "recessional": "string"
+    "content": "string"
   }
   ```
 - **Response Body (Success)**:
@@ -173,7 +162,8 @@ This document outlines the REST API for the 10x-hymns application, designed base
   {
     "data": {
       "id": "uuid",
-      "name": "string"
+      "name": "string",
+      "content": "string"
       // ... other fields
     }
   }
@@ -223,7 +213,7 @@ This document outlines the REST API for the 10x-hymns application, designed base
     - `client_fingerprint`: Must be a non-empty string.
   - **Sets**:
     - `name`: Must be a non-empty string. The database enforces uniqueness per user (`sets_user_name_ci_idx`). The API will return a `409 Conflict` error on violation.
-    - Other fields (`entrance`, `offertory`, etc.) are optional strings.
+  - `content`: Must be a string (required, non-empty).
 - **Business Logic Implementation**:
   - **Hymn Suggestion**: The `/api/suggestions` endpoint will encapsulate the logic of calling an external service (like OpenRouter.ai) to get an embedding for the input text and then querying the `hymns` table using `pgvector`'s similarity search to find the closest matches.
   - **Set Name Search**: The `GET /api/sets` endpoint will use a `LIKE` or `ILIKE` query (or `pg_trgm` for better performance) to filter sets based on the `search` query parameter, implementing the case-insensitive "contains" search requirement.

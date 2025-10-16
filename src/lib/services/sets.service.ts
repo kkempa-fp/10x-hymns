@@ -15,12 +15,9 @@ import type {
   UpdateSetResponseDto,
 } from "../../types";
 
-const SET_SELECT_COLUMNS = "id,name,entrance,offertory,communion,adoration,recessional,created_at,updated_at" as const;
+const SET_SELECT_COLUMNS = "id,name,content,created_at,updated_at" as const;
 
-type SetRow = Pick<
-  Set,
-  "id" | "name" | "entrance" | "offertory" | "communion" | "adoration" | "recessional" | "created_at" | "updated_at"
->;
+type SetRow = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
 
 export class SetServiceError extends Error {
   readonly status: number;
@@ -37,11 +34,7 @@ export class SetServiceError extends Error {
 const mapToSetDto = (row: SetRow): SetDto => ({
   id: row.id,
   name: row.name,
-  entrance: row.entrance,
-  offertory: row.offertory,
-  communion: row.communion,
-  adoration: row.adoration,
-  recessional: row.recessional,
+  content: row.content,
   created_at: row.created_at,
   updated_at: row.updated_at,
 });

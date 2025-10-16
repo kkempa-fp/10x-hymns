@@ -76,38 +76,26 @@ export interface Database {
       };
       sets: {
         Row: {
-          adoration: string;
-          communion: string;
-          created_at: string;
-          entrance: string;
           id: string;
           name: string;
-          offertory: string;
-          recessional: string;
+          content: string;
+          created_at: string;
           updated_at: string;
           user_id: string;
         };
         Insert: {
-          adoration?: string;
-          communion?: string;
-          created_at?: string;
-          entrance?: string;
           id?: string;
           name: string;
-          offertory?: string;
-          recessional?: string;
+          content?: string;
+          created_at?: string;
           updated_at?: string;
           user_id: string;
         };
         Update: {
-          adoration?: string;
-          communion?: string;
-          created_at?: string;
-          entrance?: string;
           id?: string;
           name?: string;
-          offertory?: string;
-          recessional?: string;
+          content?: string;
+          created_at?: string;
           updated_at?: string;
           user_id?: string;
         };

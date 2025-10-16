@@ -17,14 +17,10 @@
 - `id` uuid primary key default gen_random_uuid()
 - `user_id` uuid not null references auth.users(id) on delete cascade
 - `name` varchar(200) not null
-- `entrance` varchar(200) not null default ''
-- `offertory` varchar(200) not null default ''
-- `communion` varchar(200) not null default ''
-- `adoration` varchar(200) not null default ''
-- `recessional` varchar(200) not null default ''
+- `content` text not null default ''
 - `created_at` timestamptz not null default now()
 - `updated_at` timestamptz not null default now()
-- _Uwagi:_ kolumna `updated_at` aktualizowana przez trigger (patrz sekcja 5) przy każdej modyfikacji rekordu.
+- _Uwagi:_ kolumna `updated_at` aktualizowana przez trigger (patrz sekcja 5) przy każdej modyfikacji rekordu. Pole `content` przechowuje cały zestaw pieśni jako tekst.
 
 ### ratings
 

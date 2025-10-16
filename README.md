@@ -79,7 +79,7 @@ Key features include:
 - **User Authentication:** Secure registration and login for users to access personalized features.
 - **Hymn Set Management (for authenticated users):**
   - Create, view, search, edit, and delete custom hymn sets.
-  - Each set consists of five dedicated fields: Entrance, Offertory, Communion, Adoration, and Recessional.
+  - Each set consists of a single text field containing the user's hymn proposals.
 - **Suggestion Rating System:** A feedback mechanism (thumbs up/down) for users to rate the quality of hymn suggestions, helping to measure the system's effectiveness.
 
 ## Project Status
