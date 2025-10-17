@@ -76,6 +76,7 @@ const createSetSchema = z.object({
 
 - Metoda `create(userId: string, cmd: CreateSetCommand)`:
   1. Wywołanie Supabase client:
+
   ```ts
   const { data, error } = await supabase
     .from("sets")
