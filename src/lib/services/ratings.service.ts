@@ -21,22 +21,16 @@ export class RatingServiceError extends Error {
 
 const RATINGS_TABLE = "ratings" as const;
 
-const toNumericHymnNumbers = (
+const normalizeHymnNumbers = (
   numbers: SubmitRatingCommand["proposed_hymn_numbers"]
 ): RatingPersistenceModel["proposed_hymn_numbers"] => {
-  if (!numbers.length) {
+  const normalized = numbers.map((value) => value.trim()).filter((value) => value.length > 0);
+
+  if (!normalized.length) {
     throw new RatingServiceError("At least one hymn number must be provided", 400);
   }
 
-  const parsed = numbers.map((value) => {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric) || !Number.isInteger(numeric)) {
-      throw new RatingServiceError("Hymn numbers must be integers", 400);
-    }
-    return numeric;
-  });
-
-  return parsed;
+  return normalized;
 };
 
 const isValidRatingValue = (value: string): value is RatingValue => value === "up" || value === "down";
@@ -47,7 +41,7 @@ export const createRatingsService = (supabase: SupabaseClient) => {
       throw new RatingServiceError("Invalid rating value", 400);
     }
 
-    const proposedNumbers = toNumericHymnNumbers(command.proposed_hymn_numbers);
+    const proposedNumbers = normalizeHymnNumbers(command.proposed_hymn_numbers);
 
     const payload: RatingInsert = {
       client_fingerprint: command.client_fingerprint,

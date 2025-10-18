@@ -52,7 +52,7 @@ export interface Database {
           client_fingerprint: string;
           created_at: string;
           id: string;
-          proposed_hymn_numbers: number[];
+          proposed_hymn_numbers: string[];
           rating: string;
           user_id: string | null;
         };
@@ -60,7 +60,7 @@ export interface Database {
           client_fingerprint: string;
           created_at?: string;
           id?: string;
-          proposed_hymn_numbers?: number[];
+          proposed_hymn_numbers?: string[];
           rating: string;
           user_id?: string | null;
         };
@@ -68,7 +68,7 @@ export interface Database {
           client_fingerprint?: string;
           created_at?: string;
           id?: string;
-          proposed_hymn_numbers?: number[];
+          proposed_hymn_numbers?: string[];
           rating?: string;
           user_id?: string | null;
         };

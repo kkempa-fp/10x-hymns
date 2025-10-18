@@ -34,7 +34,7 @@ const listSetsSchema = z.object({
     .positive("Limit must be positive")
     .max(50, "Limit cannot exceed 50")
     .default(10),
-  sort: z.enum(["name", "created_at", "updated_at"]).default("updated_at"),
+  sort: z.enum(["name", "created_at", "updated_at", "content"]).default("updated_at"),
   order: z.enum(["asc", "desc"]).default("desc"),
 });
 

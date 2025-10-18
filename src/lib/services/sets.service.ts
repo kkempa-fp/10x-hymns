@@ -106,14 +106,27 @@ export const createSetsService = (supabase: SupabaseClient) => {
       request = request.ilike("name", `%${search}%`);
     }
 
-    const { data, error } = await request;
+    const { data, error, count } = await request;
 
     if (error) {
       throw new SetServiceError("Unable to fetch sets", 500, { cause: error });
     }
 
     const items = (data ?? []).map(mapToSetDto);
-    return { data: items } satisfies ListSetsResponseDto;
+    const total = typeof count === "number" ? count : items.length;
+    const totalPages = total > 0 ? Math.ceil(total / limit) : 1;
+
+    return {
+      data: items,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrevious: page > 1,
+      },
+    } satisfies ListSetsResponseDto;
   };
 
   const getById = async (userId: string, setId: string): Promise<GetSetResponseDto> => {

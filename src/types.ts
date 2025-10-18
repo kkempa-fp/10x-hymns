@@ -54,14 +54,24 @@ export interface ListSetsQueryDto {
   search?: string;
   page?: number;
   limit?: number;
-  sort?: "name" | "created_at" | "updated_at";
+  sort?: "name" | "created_at" | "updated_at" | "content";
   order?: "asc" | "desc";
 }
 
 export type SetDto = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
 export interface ListSetsResponseDto {
   data: SetDto[];
+  meta: PaginationMeta;
 }
 
 export type CreateSetCommand = Pick<SetInsert, SetContentColumns>;
@@ -88,3 +98,23 @@ export type DeleteSetResponseDto = null;
 // ------------------------------------------------------------------------------------------------
 export type RatingPersistenceModel = RatingInsert;
 export type SetPersistenceModel = Set;
+
+// ------------------------------------------------------------------------------------------------
+// 5. ViewModel Types
+//    Client-side models that shape form values and async state containers.
+// ------------------------------------------------------------------------------------------------
+export interface AuthFormValues {
+  email: string;
+  password: string;
+}
+
+export interface SetFormValues {
+  content: string;
+  name: string;
+}
+
+export interface AsyncState<TData> {
+  data: TData | null;
+  error: string | null;
+  loading: boolean;
+}
