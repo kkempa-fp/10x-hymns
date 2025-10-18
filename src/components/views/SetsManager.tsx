@@ -211,8 +211,8 @@ const SetsManager: FC = () => {
     <section className="flex flex-col gap-6">
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-neutral-900">Zarządzanie zestawami</h2>
-          <p className="text-sm text-neutral-600">
+          <h2 className="text-[1.375rem] font-semibold leading-tight">Zarządzanie zestawami</h2>
+          <p className="text-[0.9375rem] text-muted-foreground">
             Przechowuj zestawy pieśni, aby łatwo korzystać z nich podczas przygotowania liturgii.
           </p>
         </div>
@@ -221,10 +221,10 @@ const SetsManager: FC = () => {
         </Button>
       </header>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+      <div className="surface-raised flex flex-col gap-3 rounded-[var(--md-sys-shape-corner-extra-large)] border border-border p-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="flex w-full flex-col gap-1 md:max-w-sm">
-            <Label htmlFor="sets-search" className="text-sm font-medium text-neutral-800">
+            <Label htmlFor="sets-search" className="text-foreground">
               Wyszukaj zestaw
             </Label>
             <Input
@@ -235,10 +235,10 @@ const SetsManager: FC = () => {
               onChange={handleSearchChange}
             />
           </div>
-          <div className="text-sm text-neutral-600">Łącznie {totalSets} zestawów</div>
+          <div className="text-[0.9375rem] text-muted-foreground">Łącznie {totalSets} zestawów</div>
         </div>
 
-        {statusMessage ? <p className="text-sm text-emerald-600">{statusMessage}</p> : null}
+        {statusMessage ? <p className="text-sm text-primary">{statusMessage}</p> : null}
         {listError ? (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             <p>{listError}</p>

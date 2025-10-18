@@ -28,15 +28,15 @@ const Pagination: FC<PaginationProps> = ({ isDisabled = false, onPageChange, pag
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4">
-      <p className="text-sm text-neutral-600">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+      <p className="text-[0.9375rem] text-muted-foreground">
         Strona {clampedPage} z {safeTotal}
       </p>
       <div className="flex items-center gap-2">
-        <Button type="button" variant="outline" size="sm" onClick={handlePrevious} disabled={!canGoBack}>
+        <Button type="button" variant="ghost" size="sm" onClick={handlePrevious} disabled={!canGoBack}>
           Poprzednia
         </Button>
-        <Button type="button" variant="outline" size="sm" onClick={handleNext} disabled={!canGoForward}>
+        <Button type="button" variant="ghost" size="sm" onClick={handleNext} disabled={!canGoForward}>
           Następna
         </Button>
       </div>

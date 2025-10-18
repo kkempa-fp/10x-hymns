@@ -5,17 +5,80 @@ interface Props {
   title?: string;
 }
 
-const { title = "10x-hymns" } = Astro.props;
+const { title = "10x Hymns" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light" data-theme="system" data-theme-effective="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/pipe-organ.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline>
+      (function () {
+        // eslint-disable-next-line prettier/prettier
+        const storageKey = "10x-hymns:theme";
+        const root = document.documentElement;
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+        function readStored() {
+          let storedValue = "system";
+          try {
+            const stored = localStorage.getItem(storageKey);
+            if (stored === "light" || stored === "dark" || stored === "system") {
+              storedValue = stored;
+            }
+          } catch {
+            storedValue = "system";
+          }
+          return storedValue;
+        }
+
+        function effectiveMode(mode) {
+          const isDark = mode === "dark" || (mode === "system" && media.matches);
+          return isDark ? "dark" : "light";
+        }
+
+        function applyTheme(mode) {
+          const effective = effectiveMode(mode);
+          root.classList.toggle("dark", effective === "dark");
+          root.classList.toggle("light", effective === "light");
+          root.dataset.theme = mode;
+          root.dataset.themeEffective = effective;
+          return { mode: mode, effective: effective };
+        }
+
+        function dispatchThemeChange(detail) {
+          window.dispatchEvent(new CustomEvent("theme-change", { detail: detail }));
+        }
+
+        function setTheme(mode) {
+          try {
+            localStorage.setItem(storageKey, mode);
+          } catch {
+            /* ignore */
+          }
+          dispatchThemeChange(applyTheme(mode));
+        }
+
+        function getTheme() {
+          return readStored();
+        }
+
+        const initialMode = readStored();
+        dispatchThemeChange(applyTheme(initialMode));
+
+        window.__setPreferredTheme = setTheme;
+        window.__getPreferredTheme = getTheme;
+
+        media.addEventListener("change", function () {
+          const current = readStored();
+          dispatchThemeChange(applyTheme(current));
+        });
+      })();
+    </script>
   </head>
   <body>
     <slot />

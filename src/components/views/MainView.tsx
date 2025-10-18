@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import type { FC } from "react";
 
 import type { AuthFormValues } from "@/types";
+import { cn } from "@/lib/utils";
 
 import useAuth from "../hooks/useAuth";
 
@@ -67,26 +68,33 @@ const MainView: FC = () => {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50">
+    <div className="surface-primary flex min-h-screen flex-col">
       <Header onLoginClick={handleLoginClick} onLogoutClick={handleLogoutClick} user={user} />
-      <main className="flex flex-1 flex-col gap-6 px-4 py-6">
+      <main className="flex flex-1 flex-col gap-8 px-4 py-8 md:px-8">
         {user ? (
-          <section className="flex flex-col gap-4">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className={`cursor-pointer ${activeTab === "generator" ? "font-semibold" : "text-neutral-600"}`}
-                onClick={() => setActiveTab("generator")}
-              >
-                Generator
-              </button>
-              <button
-                type="button"
-                className={`cursor-pointer ${activeTab === "sets" ? "font-semibold" : "text-neutral-600"}`}
-                onClick={() => setActiveTab("sets")}
-              >
-                Zestawy
-              </button>
+          <section className="flex flex-col gap-6">
+            <div className="inline-flex w-full max-w-xs items-center justify-start gap-2 rounded-[var(--md-sys-shape-corner-extra-large)] bg-accent/30 p-[var(--md-sys-spacing-4)]">
+              {(
+                [
+                  { id: "generator", label: "Generator" },
+                  { id: "sets", label: "Zestawy" },
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  className={cn(
+                    "flex-1 rounded-[var(--md-sys-shape-corner-large)] px-[var(--md-sys-spacing-16)] py-[var(--md-sys-spacing-12)] text-center text-[0.9375rem] font-medium transition-all duration-200",
+                    activeTab === tab.id
+                      ? "bg-primary text-primary-foreground shadow-[var(--md-sys-elevation-level-1)]"
+                      : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                  )}
+                  onClick={() => setActiveTab(tab.id)}
+                  aria-pressed={activeTab === tab.id}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
             {activeTab === "generator" ? <SuggestionGenerator /> : <SetsManager />}
           </section>

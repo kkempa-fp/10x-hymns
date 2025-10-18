@@ -1,6 +1,6 @@
-# REST API Plan - 10x-hymns
+# REST API Plan - 10x Hymns
 
-This document outlines the REST API for the 10x-hymns application, designed based on the project's PRD, database schema, and technical stack.
+This document outlines the REST API for the 10x Hymns application, designed based on the project's PRD, database schema, and technical stack.
 
 ## 1. Resources
 

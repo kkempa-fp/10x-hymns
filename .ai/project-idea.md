@@ -1,4 +1,4 @@
-# Aplikacja - 10x-hymns (MVP)
+# Aplikacja - 10x Hymns (MVP)
 
 ## Główny problem
 

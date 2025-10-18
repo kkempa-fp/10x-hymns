@@ -1,8 +1,8 @@
-# Architektura UI - 10x-hymns
+# Architektura UI - 10x Hymns
 
 ## 1. Przegląd struktury UI
 
-Architektura interfejsu użytkownika aplikacji "10x-hymns" opiera się na modelu Single Page Application (SPA) zbudowanym przy użyciu Astro i React, zgodnie z architekturą "wysp". Główny plik `index.astro` renderuje statyczny szkielet strony, a cała interaktywność jest zamknięta w dedykowanych komponentach React.
+Architektura interfejsu użytkownika aplikacji "10x Hymns" opiera się na modelu Single Page Application (SPA) zbudowanym przy użyciu Astro i React, zgodnie z architekturą "wysp". Główny plik `index.astro` renderuje statyczny szkielet strony, a cała interaktywność jest zamknięta w dedykowanych komponentach React.
 
 - **Użytkownik niezalogowany**: Widzi prosty, wyśrodkowany interfejs skupiony wyłącznie na generatorze propozycji pieśni.
 - **Użytkownik zalogowany**: Interfejs rozszerza się o dodatkowe funkcjonalności zarządzania zestawami pieśni, prezentowane w formie zakładek, co pozwala na oddzielenie głównych obszarów funkcjonalnych aplikacji.

@@ -112,14 +112,14 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
 
   const modal = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-surface/70 px-4 py-6 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="set-form-modal-title"
     >
-      <div className="w-full max-w-xl rounded-xl bg-white p-6 shadow-2xl">
+      <div className="w-full max-w-3xl rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-4)]">
         <header className="flex items-center justify-between">
-          <h2 id="set-form-modal-title" className="text-lg font-semibold text-neutral-900">
+          <h2 id="set-form-modal-title" className="text-[1.375rem] font-semibold leading-tight">
             {getTitle(mode)}
           </h2>
           <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
@@ -127,7 +127,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
           </Button>
         </header>
 
-        <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+        <form className="mt-6 flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
           <div className="flex flex-col gap-2">
             <Label htmlFor="set-name">Nazwa zestawu</Label>
             <Input
@@ -145,8 +145,8 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="set-content">Opis lub spis pieśni</Label>
-              <span className="text-xs text-neutral-500">
+              <Label htmlFor="set-content">Opis / zawartość</Label>
+              <span className="text-xs text-muted-foreground">
                 {contentLength}/{CONTENT_LIMIT}
               </span>
             </div>
@@ -160,7 +160,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
               className="font-mono"
               maxLength={CONTENT_LIMIT}
             />
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-muted-foreground">
               Opisz przeznaczenie zestawu lub wypisz pieśni, które powinny się w nim znaleźć.
             </p>
           </div>
@@ -168,7 +168,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
           {combinedError ? <p className="text-sm text-destructive">{combinedError}</p> : null}
 
           <div className="flex items-center justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
               Anuluj
             </Button>
             <Button type="submit" disabled={loading}>

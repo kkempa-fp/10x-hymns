@@ -8,6 +8,13 @@ declare global {
       supabase: SupabaseClient;
     }
   }
+
+  type ThemeMode = "light" | "dark" | "system";
+
+  interface Window {
+    __setPreferredTheme?: (mode: ThemeMode) => void;
+    __getPreferredTheme?: () => ThemeMode;
+  }
 }
 
 interface ImportMetaEnv {

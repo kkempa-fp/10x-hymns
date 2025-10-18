@@ -1,8 +1,8 @@
-# Dokument wymagań produktu (PRD) - 10x-hymns
+# Dokument wymagań produktu (PRD) - 10x Hymns
 
 ## 1. Przegląd produktu
 
-Aplikacja "10x-hymns" to inteligentne narzędzie webowe zaprojektowane w celu uproszczenia i przyspieszenia procesu doboru pieśni do liturgii mszy świętej. Aplikacja, działająca jako Single Page Application (SPA), analizuje wprowadzony przez użytkownika fragment tekstu liturgicznego (np. antyfony, czytania) i na jego podstawie proponuje pasujące pieśni, wykorzystując do tego celu wektory embeddingu. Użytkownicy mogą tworzyć konta, aby zapisywać, przeglądać i zarządzać własnymi zestawami pieśni na poszczególne dni w ciągu roku liturgicznego. Interfejs aplikacji jest w pełni responsywny (RWD), zapewniając komfort użytkowania na różnych urządzeniach.
+Aplikacja "10x Hymns" to inteligentne narzędzie webowe zaprojektowane w celu uproszczenia i przyspieszenia procesu doboru pieśni do liturgii mszy świętej. Aplikacja, działająca jako Single Page Application (SPA), analizuje wprowadzony przez użytkownika fragment tekstu liturgicznego (np. antyfony, czytania) i na jego podstawie proponuje pasujące pieśni, wykorzystując do tego celu wektory embeddingu. Użytkownicy mogą tworzyć konta, aby zapisywać, przeglądać i zarządzać własnymi zestawami pieśni na poszczególne dni w ciągu roku liturgicznego. Interfejs aplikacji jest w pełni responsywny (RWD), zapewniając komfort użytkowania na różnych urządzeniach.
 
 ## 2. Problem użytkownika
 

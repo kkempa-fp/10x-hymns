@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CreateSetCommand, SetDto, UpdateSetCommand } from "@/types";
+import { resolveRequestError } from "@/lib/errors";
 
 interface UseSetMutationResult {
   createSet: (payload: CreateSetCommand) => Promise<SetDto | null>;
@@ -79,7 +80,7 @@ const useSetMutation = (): UseSetMutationResult => {
         return payload;
       } catch (unknownError) {
         if (isMountedRef.current) {
-          const message = unknownError instanceof Error ? unknownError.message : "Wystąpił nieznany błąd.";
+          const message = resolveRequestError(unknownError, "Wystąpił nieznany błąd.");
           setError(message);
         }
         return null;

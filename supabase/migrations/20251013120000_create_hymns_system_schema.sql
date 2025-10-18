@@ -1,5 +1,5 @@
 -- Migration: Create hymns system schema
--- Purpose: Initialize database schema for 10x-hymns application
+-- Purpose: Initialize database schema for 10x Hymns application
 -- Affected tables: hymns, sets, ratings
 -- Special considerations: 
 --   - Requires pgvector extension for embeddings

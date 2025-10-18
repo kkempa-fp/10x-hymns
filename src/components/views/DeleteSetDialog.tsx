@@ -76,24 +76,24 @@ const DeleteSetDialog: FC<DeleteSetDialogProps> = ({ error, isOpen, loading, onC
 
   const dialog = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-surface/70 px-4 py-6 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="delete-set-dialog-title"
     >
-      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
-        <h2 id="delete-set-dialog-title" className="text-lg font-semibold text-neutral-900">
+      <div className="w-full max-w-lg rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-4)]">
+        <h2 id="delete-set-dialog-title" className="text-[1.375rem] font-semibold leading-tight">
           Usuń zestaw
         </h2>
-        <p className="mt-3 text-sm text-neutral-700">
-          Czy na pewno chcesz usunąć zestaw <span className="font-mono font-semibold">{setName}</span>? Tej operacji nie
-          można cofnąć.
+        <p className="mt-3 text-[0.9375rem] text-muted-foreground">
+          Czy na pewno chcesz usunąć zestaw <span className="font-mono font-semibold text-foreground">{setName}</span>?
+          Tej operacji nie można cofnąć.
         </p>
 
         {combinedError ? <p className="mt-3 text-sm text-destructive">{combinedError}</p> : null}
 
         <div className="mt-6 flex items-center justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
             Anuluj
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={loading}>

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FC, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabaseClient } from "@/db/supabase.client";
+import { resolveRequestError } from "@/lib/errors";
 import type {
   GenerateSuggestionsCommand,
   GenerateSuggestionsResponseDto,
@@ -95,7 +97,7 @@ const SuggestionGenerator: FC = () => {
       setSuggestions(data.data);
       setStatusMessage(`Otrzymano ${data.data.length} propozycji.`);
     } catch (requestError) {
-      const message = requestError instanceof Error ? requestError.message : "Wystąpił nieznany błąd.";
+      const message = resolveRequestError(requestError, "Wystąpił nieznany błąd.");
       setError(message);
       setSuggestions([]);
     } finally {
@@ -151,7 +153,7 @@ const SuggestionGenerator: FC = () => {
         setStatusMessage(rating === "up" ? "Dziękujemy za pozytywną opinię!" : "Zapisaliśmy Twoją uwagę.");
         setLastRating(rating);
       } catch (requestError) {
-        const message = requestError instanceof Error ? requestError.message : "Wystąpił nieznany błąd.";
+        const message = resolveRequestError(requestError, "Wystąpił nieznany błąd.");
         setError(message);
       } finally {
         setRatingLoading(false);
@@ -164,19 +166,17 @@ const SuggestionGenerator: FC = () => {
   const isRatingDisabled = suggestions.length === 0 || ratingLoading || lastRating !== null;
 
   return (
-    <section className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <section className="surface-raised rounded-[var(--md-sys-shape-corner-extra-large)] border border-border p-6">
       <header className="flex flex-col gap-1">
-        <h2 className="text-xl font-semibold text-neutral-900">Generator sugestii pieśni</h2>
-        <p className="text-sm text-neutral-600">
+        <h2 className="text-[1.375rem] font-semibold leading-tight">Generator sugestii pieśni</h2>
+        <p className="text-[0.9375rem] text-muted-foreground">
           Wpisz fragment liturgii lub temat przewodni, a my zaproponujemy pieśni pasujące do Twojej celebracji.
         </p>
       </header>
 
-      <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
         <div className="flex flex-col gap-2">
-          <label htmlFor="suggestion-input" className="text-sm font-medium text-neutral-800">
-            Treść antyfony lub czytań
-          </label>
+          <Label htmlFor="suggestion-input">Treść antyfony lub czytań</Label>
           <Textarea
             id="suggestion-input"
             placeholder="Tutaj wklej lub wpisz tekst antyfony, czytań lub krótki opis liturgii..."
@@ -190,7 +190,7 @@ const SuggestionGenerator: FC = () => {
           <Button type="submit" disabled={isGenerateDisabled}>
             {loading ? "Generowanie..." : "Generuj propozycje"}
           </Button>
-          <span className="text-sm text-neutral-500">
+          <span className="text-[0.9375rem] text-muted-foreground">
             Otrzymasz {SUGGESTION_COUNT} dopasowanych pieśni na podstawie danych z bazy.
           </span>
         </div>
@@ -198,10 +198,13 @@ const SuggestionGenerator: FC = () => {
 
       <div className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label htmlFor="suggestion-output" className="text-sm font-medium text-neutral-800">
-            Proponowane pieśni
-          </label>
-          <Textarea id="suggestion-output" value={suggestionsAsText} readOnly className="bg-neutral-100 font-mono" />
+          <Label htmlFor="suggestion-output">Proponowane pieśni</Label>
+          <Textarea
+            id="suggestion-output"
+            value={suggestionsAsText}
+            readOnly
+            className="bg-muted/60 font-mono text-[0.9375rem]"
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -224,14 +227,14 @@ const SuggestionGenerator: FC = () => {
             👎 Nietrafione sugestie
           </Button>
           {lastRating ? (
-            <span className="text-sm text-neutral-600">
+            <span className="text-[0.9375rem] text-muted-foreground">
               Ostatnia ocena: {lastRating === "up" ? "pozytywna" : "negatywna"}
             </span>
           ) : null}
         </div>
 
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        {statusMessage && !error ? <p className="text-sm text-emerald-600">{statusMessage}</p> : null}
+        {statusMessage && !error ? <p className="text-sm text-primary">{statusMessage}</p> : null}
       </div>
     </section>
   );

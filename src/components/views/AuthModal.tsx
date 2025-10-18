@@ -58,22 +58,22 @@ const AuthModal: FC<AuthModalProps> = ({ activeTab, isOpen, loginForm, onClose, 
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-surface/70 px-4 py-6 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-3)]">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Zaloguj się lub zarejestruj</h2>
+          <h2 className="text-[1.375rem] font-semibold leading-tight">Zaloguj się lub zarejestruj</h2>
           <Button type="button" variant="ghost" onClick={onClose}>
             Zamknij
           </Button>
         </div>
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2 rounded-[var(--md-sys-shape-corner-large)] bg-accent/30 p-1">
           <Button
             type="button"
-            variant={activeTab === "login" ? "default" : "outline"}
+            variant={activeTab === "login" ? "tonal" : "ghost"}
             onClick={() => onTabChange("login")}
             aria-pressed={activeTab === "login"}
             className="flex-1"
@@ -82,7 +82,7 @@ const AuthModal: FC<AuthModalProps> = ({ activeTab, isOpen, loginForm, onClose, 
           </Button>
           <Button
             type="button"
-            variant={activeTab === "register" ? "default" : "outline"}
+            variant={activeTab === "register" ? "tonal" : "ghost"}
             onClick={() => onTabChange("register")}
             aria-pressed={activeTab === "register"}
             className="flex-1"

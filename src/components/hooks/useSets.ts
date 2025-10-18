@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AsyncState, ListSetsQueryDto, ListSetsResponseDto } from "@/types";
+import { resolveRequestError } from "@/lib/errors";
 
 interface UseSetsResult {
   data: ListSetsResponseDto | null;
@@ -56,7 +57,7 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
         return;
       }
 
-      const message = requestError instanceof Error ? requestError.message : "Wystąpił nieznany błąd.";
+      const message = resolveRequestError(requestError, "Nie udało się pobrać listy zestawów.");
       setState((previous) => ({ data: previous.data, error: message, loading: false }));
     }
   }, []);

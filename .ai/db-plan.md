@@ -1,4 +1,4 @@
-# Schemat bazy danych - 10x-hymns
+# Schemat bazy danych - 10x Hymns
 
 ## 1. Lista tabel
 

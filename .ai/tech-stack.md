@@ -1,4 +1,4 @@
-# Stos technologiczny - 10x-hymns
+# Stos technologiczny - 10x Hymns
 
 ## Frontend
 

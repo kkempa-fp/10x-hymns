@@ -55,28 +55,28 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
 }) => {
   if (!loading && sets.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-neutral-600">
-        <h3 className="text-base font-semibold text-neutral-800">Brak zestawów</h3>
-        <p className="text-sm text-neutral-600">
-          Dodaj pierwszy zestaw, aby przechowywać i organizować proponowane pieśni.
+      <div className="flex flex-col items-start gap-2 rounded-[var(--md-sys-shape-corner-extra-large)] border border-dashed border-border bg-muted/40 p-6 text-muted-foreground">
+        <h3 className="text-base font-semibold text-foreground">Brak zestawów</h3>
+        <p className="text-sm text-muted-foreground">
+          Dodaj pierwszy zestaw, aby przechowywać i organizować propozycje pieśni.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-neutral-200">
-        <thead className="bg-neutral-50">
+    <div className="overflow-hidden rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background shadow-[var(--md-sys-elevation-level-1)]">
+      <table className="min-w-full divide-y divide-border/60">
+        <thead className="bg-muted/40">
           <tr>
             <th
               scope="col"
-              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600"
+              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
               aria-sort={sortField === "name" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 text-left text-neutral-600 transition-colors hover:text-neutral-800 cursor-pointer"
+                className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("name")}
               >
                 Nazwa zestawu <span aria-hidden>{sortIndicator(sortField === "name", sortOrder)}</span>
@@ -84,12 +84,12 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
             </th>
             <th
               scope="col"
-              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600"
+              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
               aria-sort={sortField === "content" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 text-left text-neutral-600 transition-colors hover:text-neutral-800 cursor-pointer"
+                className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("content")}
               >
                 Opis / zawartość <span aria-hidden>{sortIndicator(sortField === "content", sortOrder)}</span>
@@ -97,12 +97,12 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
             </th>
             <th
               scope="col"
-              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-neutral-600"
+              className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"
               aria-sort={sortField === "updated_at" ? (sortOrder === "asc" ? "ascending" : "descending") : "none"}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 text-left text-neutral-600 transition-colors hover:text-neutral-800 cursor-pointer"
+                className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("updated_at")}
               >
                 Ostatnia aktualizacja <span aria-hidden>{sortIndicator(sortField === "updated_at", sortOrder)}</span>
@@ -110,32 +110,30 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
             </th>
             <th
               scope="col"
-              className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-neutral-600"
-            >
-              Akcje
-            </th>
+              className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            ></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className="divide-y divide-border/40">
           {loading ? (
             <tr>
               <td className="px-4 py-4" colSpan={4}>
-                <div className="h-6 w-3/4 animate-pulse rounded bg-neutral-100" />
+                <div className="h-6 w-3/4 animate-pulse rounded bg-muted/50" />
               </td>
             </tr>
           ) : null}
           {sets.map((set) => (
-            <tr key={set.id} className="hover:bg-neutral-50">
+            <tr key={set.id} className="hover:bg-primary/5">
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-col gap-1">
-                  <span className="font-mono text-sm font-medium text-neutral-900">{set.name}</span>
-                  <span className="text-xs text-neutral-500">ID: {set.id}</span>
+                  <span className="font-mono text-sm font-medium text-foreground">{set.name}</span>
+                  <span className="text-xs text-muted-foreground">ID: {set.id}</span>
                 </div>
               </td>
-              <td className="px-4 py-4 align-top text-sm text-neutral-700">
-                <span className="whitespace-pre-line font-mono">{renderContentPreview(set.content ?? "")}</span>
+              <td className="px-4 py-4 align-top text-sm text-foreground/80">
+                <span className="whitespace-pre-wrap font-mono">{renderContentPreview(set.content ?? "")}</span>
               </td>
-              <td className="px-4 py-4 align-top text-sm text-neutral-600">
+              <td className="px-4 py-4 align-top text-sm text-muted-foreground">
                 {formatDate(set.updated_at ?? set.created_at)}
               </td>
               <td className="px-4 py-4 align-top">
