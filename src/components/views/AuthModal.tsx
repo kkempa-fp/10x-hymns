@@ -2,19 +2,20 @@ import { createPortal } from "react-dom";
 import { useEffect, useState, type FC, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type AuthModalTab = "login" | "register";
+type AuthModalView = "login" | "register";
 
 interface AuthModalProps {
-  activeTab: AuthModalTab;
+  activeView: AuthModalView;
   isOpen: boolean;
   loginForm: ReactNode;
   onClose: () => void;
-  onTabChange: (tab: AuthModalTab) => void;
+  onViewChange: (view: AuthModalView) => void;
   registerForm: ReactNode;
 }
 
-const AuthModal: FC<AuthModalProps> = ({ activeTab, isOpen, loginForm, onClose, onTabChange, registerForm }) => {
+const AuthModal: FC<AuthModalProps> = ({ activeView, isOpen, loginForm, onClose, onViewChange, registerForm }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -56,13 +57,15 @@ const AuthModal: FC<AuthModalProps> = ({ activeTab, isOpen, loginForm, onClose, 
     return null;
   }
 
+  const currentTab = activeView;
+
   const modalContent = (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-surface/70 px-4 py-6 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
     >
-      <div className="relative w-full max-w-lg rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-3)]">
+      <div className="relative w-full max-w-xl rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-3)]">
         <div className="flex items-center justify-between">
           <h2 className="text-[1.375rem] font-semibold leading-tight">Zaloguj się lub zarejestruj</h2>
           <Button type="button" variant="ghost" onClick={onClose}>
@@ -70,28 +73,14 @@ const AuthModal: FC<AuthModalProps> = ({ activeTab, isOpen, loginForm, onClose, 
           </Button>
         </div>
 
-        <div className="mt-4 flex gap-2 rounded-[var(--md-sys-shape-corner-large)] bg-accent/30 p-1">
-          <Button
-            type="button"
-            variant={activeTab === "login" ? "tonal" : "ghost"}
-            onClick={() => onTabChange("login")}
-            aria-pressed={activeTab === "login"}
-            className="flex-1"
-          >
-            Logowanie
-          </Button>
-          <Button
-            type="button"
-            variant={activeTab === "register" ? "tonal" : "ghost"}
-            onClick={() => onTabChange("register")}
-            aria-pressed={activeTab === "register"}
-            className="flex-1"
-          >
-            Rejestracja
-          </Button>
-        </div>
-
-        <div className="mt-6">{activeTab === "login" ? loginForm : registerForm}</div>
+        <Tabs value={currentTab} onValueChange={(value) => onViewChange(value as AuthModalView)} className="mt-4">
+          <TabsList className="w-full">
+            <TabsTrigger value="login">Logowanie</TabsTrigger>
+            <TabsTrigger value="register">Rejestracja</TabsTrigger>
+          </TabsList>
+          <TabsContent value="login">{loginForm}</TabsContent>
+          <TabsContent value="register">{registerForm}</TabsContent>
+        </Tabs>
       </div>
     </div>
   );

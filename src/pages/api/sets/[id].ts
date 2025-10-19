@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 
-import { DEFAULT_USER_ID } from "../../../db/supabase.client.ts";
 import { createSetsService, SetServiceError } from "../../../lib/services/sets.service.ts";
 import type { UpdateSetCommand } from "../../../types";
 
@@ -39,14 +38,19 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
   }
 
+  if (!userId) {
+    return jsonResponse({ error: "Musisz być zalogowany, aby wyświetlać zestawy." }, 401);
+  }
+
   try {
     const setId = extractSetId(params);
-    const response = await createSetsService(supabase).getById(DEFAULT_USER_ID, setId);
+    const response = await createSetsService(supabase).getById(userId, setId);
     return jsonResponse(response, 200);
   } catch (unknownError) {
     if (unknownError instanceof SetServiceError) {
@@ -59,9 +63,14 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const PUT: APIRoute = async ({ request, params, locals }) => {
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
+  }
+
+  if (!userId) {
+    return jsonResponse({ error: "Musisz być zalogowany, aby aktualizować zestawy." }, 401);
   }
 
   let command: UpdateSetCommand;
@@ -87,7 +96,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
 
   try {
     const setId = extractSetId(params);
-    const response = await createSetsService(supabase).update(DEFAULT_USER_ID, setId, command);
+    const response = await createSetsService(supabase).update(userId, setId, command);
     return jsonResponse(response, 200);
   } catch (unknownError) {
     if (unknownError instanceof SetServiceError) {
@@ -100,14 +109,19 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
   }
 
+  if (!userId) {
+    return jsonResponse({ error: "Musisz być zalogowany, aby usuwać zestawy." }, 401);
+  }
+
   try {
     const setId = extractSetId(params);
-    await createSetsService(supabase).remove(DEFAULT_USER_ID, setId);
+    await createSetsService(supabase).remove(userId, setId);
     return new Response(null, { status: 204 });
   } catch (unknownError) {
     if (unknownError instanceof SetServiceError) {

@@ -32,7 +32,7 @@ const resolveTheme = (mode?: ThemeMode | null): ResolvedTheme => {
 };
 
 const ThemeToggle = () => {
-  const [mode, setMode] = useState<ResolvedTheme>(() => resolveTheme());
+  const [mode, setMode] = useState<ResolvedTheme>("light");
 
   useEffect(() => {
     if (typeof window === "undefined") {

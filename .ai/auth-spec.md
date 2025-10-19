@@ -2,7 +2,7 @@
 
 ## 1. Wprowadzenie
 
-Niniejszy dokument opisuje architekturę i implementację modułu uwierzytelniania, logowania i odzyskiwania hasła dla aplikacji "10x Hymns". Specyfikacja bazuje na wymaganiach funkcjonalnych z dokumentu PRD (historyjki użytkownika US-001, US-002) oraz na zdefiniowanym stosie technologicznym.
+Niniejszy dokument opisuje architekturę i implementację modułu uwierzytelniania, logowania i wylogowywania dla aplikacji "10x Hymns". Specyfikacja bazuje na wymaganiach funkcjonalnych z dokumentu PRD (historyjki użytkownika US-001, US-002) oraz na zdefiniowanym stosie technologicznym.
 
 Celem jest integracja systemu autentykacji Supabase z aplikacją Astro, zapewniając płynne i bezpieczne doświadczenie użytkownika, rozdzielając widoki i funkcjonalności dla użytkowników zalogowanych i niezalogowanych.
 
@@ -12,21 +12,20 @@ Celem jest integracja systemu autentykacji Supabase z aplikacją Astro, zapewnia
 
 #### 2.1.1. `src/layouts/Layout.astro`
 
-Layout zostanie rozszerzony o logikę sprawdzania statusu zalogowania użytkownika. Sesja będzie dostępna po stronie serwera dzięki `Astro.locals.session`.
+Layout odpowiada za dostarczenie globalnych styli i zachowania motywu. Status zalogowania jest ustalany dynamicznie po stronie klienta na podstawie wywołań do `/api/auth/session`.
 
-- **Cel:** Dostarczenie informacji o sesji użytkownika do wszystkich stron i komponentów renderowanych na serwerze.
+- **Cel:** Zapewnienie spójnych styli, struktury dokumentu oraz skryptów odpowiedzialnych za motyw; Layout pozostaje niezależny od stanu sesji.
 - **Zmiany:**
-  - Pobranie sesji z `Astro.locals`.
-  - Przekazanie informacji o sesji (lub jej braku) jako `prop` do komponentu `Header.tsx`.
-  - Dodanie globalnego store'a (np. `nanostores`) w celu udostępnienia stanu sesji komponentom klienckim bez konieczności "prop drilling". Store będzie inicjalizowany danymi z serwera.
+  - Import globalnych styli oraz skryptu sterującego motywem.
+  - Utrzymanie prostego `slot`-u, ponieważ logika sesji została przeniesiona do warstwy klienckiej (`useAuth`).
 
 #### 2.1.2. `src/pages/index.astro`
 
-Główna strona aplikacji będzie renderować komponenty warunkowo, w zależności od stanu uwierzytelnienia.
+Główna strona uruchamia kliencki komponent `MainView.tsx`, który samodzielnie ustala stan uwierzytelnienia na podstawie hooka `useAuth`.
 
-- **Użytkownik niezalogowany:** Widoczny będzie komponent `SuggestionGenerator.tsx`.
-- **Użytkownik zalogowany:** Oprócz `SuggestionGenerator.tsx`, widoczny będzie również panel `SetsManager.tsx`.
-- **Logika:** Strona wykorzysta dane o sesji z `Astro.locals` do podjęcia decyzji, które komponenty renderować.
+- **Użytkownik niezalogowany:** `MainView` renderuje `SuggestionGenerator.tsx`.
+- **Użytkownik zalogowany:** `MainView` oprócz generatora pokazuje panel `SetsManager.tsx`.
+- **Logika:** Warunkowe renderowanie odbywa się po stronie klienta; SSR nie zależy od `Astro.locals.session`.
 
 ### 2.2. Komponenty (React)
 
@@ -38,14 +37,20 @@ Komponent nagłówka będzie dynamicznie wyświetlał przyciski w zależności o
 - **Użytkownik zalogowany:** Wyświetla adres e-mail użytkownika oraz przycisk "Wyloguj się".
 - **Logika:** Komponent będzie subskrybował globalny store autentykacji, aby dynamicznie reagować na zmiany stanu (logowanie/wylogowanie).
 
-#### 2.2.2. `src/components/views/AuthModal.tsx` (Nowy/Do rozbudowy)
+#### 2.2.2. `src/components/views/AuthModal.tsx`
 
 Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji.
 
 - **Struktura:** Komponent oparty na `Tabs` z `shadcn/ui`, zawierający dwie zakładki: "Logowanie" i "Rejestracja".
 - **Odpowiedzialność:** Zarządzanie stanem formularzy, obsługa interakcji użytkownika (wprowadzanie danych), ale delegowanie logiki biznesowej (walidacja, komunikacja z API) do dedykowanych komponentów-formularzy.
 
-#### 2.2.3. `src/components/views/LoginForm.tsx`
+#### 2.2.3. `src/components/views/MainView.tsx`
+
+- **Rola:** Spina widok główny aplikacji i zarządza stanem modala logowania/rejestracji.
+- **Logika:** Korzysta z hooka `useAuth` do pobierania informacji o sesji, deleguje obsługę logowania, rejestracji i wylogowania oraz przełącza zakładki modala.
+- **Renderowanie warunkowe:** Na podstawie obecności `user` z `useAuth` pokazuje panel zestawów lub sam generator.
+
+#### 2.2.4. `src/components/views/LoginForm.tsx`
 
 - **Pola:** `email`, `password`.
 - **Walidacja (client-side):** Z użyciem `zod` i `react-hook-form` do sprawdzania podstawowej poprawności (np. czy pola nie są puste, poprawny format e-mail).
@@ -53,7 +58,7 @@ Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji
 - **Obsługa błędów:** Wyświetlanie komunikatów o błędach zwróconych z backendu (np. "Nieprawidłowe dane logowania").
 - **Nawigacja:** Po pomyślnym zalogowaniu, modal jest zamykany, a stan aplikacji jest odświeżany w celu wyświetlenia widoku dla zalogowanego użytkownika.
 
-#### 2.2.4. `src/components/views/RegisterForm.tsx`
+#### 2.2.5. `src/components/views/RegisterForm.tsx`
 
 - **Pola:** `email`, `password`, `confirmPassword`.
 - **Walidacja (client-side):**
@@ -62,7 +67,7 @@ Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji
   - Sprawdzenie, czy hasła w obu polach są identyczne.
 - **Komunikacja:** Wywołanie funkcji z hooka `useAuth` w celu rejestracji w Supabase.
 - **Obsługa błędów:** Wyświetlanie komunikatów (np. "Użytkownik o tym adresie e-mail już istnieje").
-- **Nawigacja:** Po pomyślnej rejestracji, system wyświetla komunikat o konieczności potwierdzenia adresu e-mail. Użytkownik musi kliknąć w link weryfikacyjny wysłany na jego skrzynkę, zanim będzie mógł się zalogować. Modal jest zamykany, a użytkownik może przejść do logowania.
+- **Nawigacja:** Po pomyślnej rejestracji modal zostaje zamknięty, a użytkownik jest automatycznie zalogowany i może korzystać z panelu zestawów bez dodatkowych kroków.
 
 ### 2.3. Hooki (React)
 
@@ -71,11 +76,12 @@ Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji
 Centralny hook do zarządzania logiką autentykacji po stronie klienta.
 
 - **Funkcje:**
-  - `signIn(credentials)`: Loguje użytkownika przy użyciu klienta Supabase.
-  - `signUp(credentials)`: Rejestruje nowego użytkownika.
-  - `signOut()`: Wylogowuje użytkownika.
-  - `recoverPassword(email)`: Inicjuje proces odzyskiwania hasła.
-- **Zarządzanie stanem:** Hook będzie odpowiedzialny za aktualizację globalnego store'a po udanej operacji, informując resztę aplikacji o zmianie stanu uwierzytelnienia.
+  - `signIn(credentials)`: Loguje użytkownika poprzez wywołanie `/api/auth/login`.
+  - `signUp(credentials)`: Rejestruje nowego użytkownika poprzez `/api/auth/register`.
+  - `signOut()`: Wylogowuje użytkownika poprzez `/api/auth/logout`.
+  - `resetError()`: Czyści komunikaty błędów przed ponowną próbą.
+  - Automatyczne `loadSession()`: Wywoływane po montażu i udanych operacjach, aby zsynchronizować stan z `/api/auth/session`.
+- **Zarządzanie stanem:** Hook lokalnie przechowuje `user`, `loading` i `error`, udostępniając je komponentom korzystającym z `useAuth`.
 
 ## 3. Logika Backendowa
 
@@ -94,7 +100,14 @@ Middleware będzie kluczowym elementem integracji z Supabase Auth.
 
 ### 3.2. Endpointy API
 
-Nie będą tworzone dedykowane endpointy API dla logowania i rejestracji, ponieważ klient będzie komunikował się bezpośrednio z Supabase Auth SDK. Endpointy API związane z zarządzaniem zestawami (`/api/sets`) będą jednak korzystać z sesji udostępnionej przez middleware do autoryzacji operacji.
+Warstwa API zapewnia cienkie kontrolery pośredniczące między klientem SPA a Supabase Auth. Kluczowe trasy:
+
+- `POST /api/auth/login` – deleguje do `supabase.auth.signInWithPassword()` i zwraca sesję.
+- `POST /api/auth/register` – wywołuje `supabase.auth.signUp()` i zwraca aktywne konto bez wymogu weryfikacji e-mail.
+- `POST /api/auth/logout` – czyści sesję w Supabase.
+- `GET /api/auth/session` – odczytuje bieżącą sesję i zwraca dane użytkownika (lub `null`).
+
+Endpointy zestawów (`/api/sets*`) wymagają obecności `locals.user` ustawionego przez middleware i odrzucają żądania niezalogowanych użytkowników.
 
 ### 3.3. Konfiguracja renderowania
 
@@ -102,11 +115,6 @@ Plik `astro.config.mjs` zostanie zaktualizowany, aby włączyć renderowanie po 
 
 ## 4. System Autentykacji (Supabase)
 
-- **Rejestracja i Logowanie:** Wykorzystanie metod `supabase.auth.signUp()` i `supabase.auth.signInWithPassword()` z biblioteki `@supabase/supabase-js` po stronie klienta (w hooku `useAuth`).
-- **Wylogowanie:** Wywołanie `supabase.auth.signOut()`.
-- **Odzyskiwanie hasła:**
-  - Użytkownik podaje e-mail w dedykowanym formularzu (może być to osobny widok w `AuthModal`).
-  - Wywołanie `supabase.auth.resetPasswordForEmail()`.
-  - Supabase wysyła e-mail z linkiem do resetu hasła.
-  - Użytkownik, klikając w link, jest przekierowywany na specjalną stronę w aplikacji (np. `/update-password`), gdzie może ustawić nowe hasło. Ta strona będzie obsługiwać token z URL i wywoływać `supabase.auth.updateUser()`.
-- **Zarządzanie sesją:** Sesja jest automatycznie zarządzana przez Supabase SDK przy użyciu `cookies`. Middleware w Astro zapewnia synchronizację stanu sesji między klientem a serwerem.
+- **Rejestracja i Logowanie:** Warstwa API korzysta z `supabase.auth.signUp()` oraz `supabase.auth.signInWithPassword()`, a hook `useAuth` komunikuje się wyłącznie z endpointami `/api/auth/*`.
+- **Wylogowanie:** `POST /api/auth/logout` deleguje do `supabase.auth.signOut()` i czyści ciasteczka sesyjne.
+- **Zarządzanie sesją:** Supabase utrzymuje sesję w ciasteczkach httpOnly; middleware dopasowuje ją do `locals`, a `useAuth` odświeża stan klienta poprzez `/api/auth/session`.

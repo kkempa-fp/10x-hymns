@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
-import { supabaseClient } from "@/db/supabase.client";
 import type { AuthFormValues } from "@/types";
 
 interface UseAuthResult {
@@ -20,43 +19,50 @@ const useAuth = (): UseAuthResult => {
   const [error, setError] = useState<string | null>(null);
   const isMountedRef = useRef(true);
 
+  const loadSession = useCallback(async () => {
+    if (!isMountedRef.current) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/session", { credentials: "include" });
+
+      if (!response.ok) {
+        throw new Error("Nie udało się pobrać informacji o sesji.");
+      }
+
+      const data = (await response.json()) as { user: User | null };
+
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      setUser(data.user ?? null);
+      setError(null);
+    } catch (sessionError) {
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      setUser(null);
+      setError(sessionError instanceof Error ? sessionError.message : "Nie udało się pobrać informacji o sesji.");
+    } finally {
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     isMountedRef.current = true;
-
-    const loadUser = async () => {
-      setLoading(true);
-      const { data, error: fetchError } = await supabaseClient.auth.getUser();
-
-      if (!isMountedRef.current) {
-        return;
-      }
-
-      if (fetchError) {
-        setError(fetchError.message);
-        setUser(null);
-      } else {
-        setError(null);
-        setUser(data.user ?? null);
-      }
-
-      setLoading(false);
-    };
-
-    loadUser();
-
-    const { data: authSubscription } = supabaseClient.auth.onAuthStateChange((_, session) => {
-      if (!isMountedRef.current) {
-        return;
-      }
-
-      setUser(session?.user ?? null);
-    });
+    loadSession();
 
     return () => {
       isMountedRef.current = false;
-      authSubscription?.subscription.unsubscribe();
     };
-  }, []);
+  }, [loadSession]);
 
   const resetError = useCallback(() => {
     if (!isMountedRef.current) {
@@ -66,65 +72,107 @@ const useAuth = (): UseAuthResult => {
     setError(null);
   }, []);
 
-  const signIn = useCallback(async ({ email, password }: AuthFormValues) => {
-    setLoading(true);
-    const { error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
+  const signIn = useCallback(
+    async ({ email, password }: AuthFormValues) => {
+      setLoading(true);
 
-    if (!isMountedRef.current) {
-      return false;
-    }
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        });
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return false;
-    } else {
-      setError(null);
-    }
+        if (!response.ok) {
+          const body = (await response.json().catch(() => ({}))) as { error?: string };
+          throw new Error(body.error ?? "Nie udało się zalogować.");
+        }
 
-    setLoading(false);
-    return true;
-  }, []);
+        await loadSession();
 
-  const signUp = useCallback(async ({ email, password }: AuthFormValues) => {
-    setLoading(true);
-    const { error: authError } = await supabaseClient.auth.signUp({ email, password });
+        if (isMountedRef.current) {
+          setError(null);
+        }
 
-    if (!isMountedRef.current) {
-      return false;
-    }
+        return true;
+      } catch (authError) {
+        if (isMountedRef.current) {
+          setError(authError instanceof Error ? authError.message : "Nie udało się zalogować.");
+          setLoading(false);
+        }
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return false;
-    } else {
-      setError(null);
-    }
+        return false;
+      }
+    },
+    [loadSession]
+  );
 
-    setLoading(false);
-    return true;
-  }, []);
+  const signUp = useCallback(
+    async ({ email, password }: AuthFormValues) => {
+      setLoading(true);
+
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password, confirmPassword: password }),
+        });
+
+        if (!response.ok) {
+          const body = (await response.json().catch(() => ({}))) as { error?: string };
+          throw new Error(body.error ?? "Nie udało się zarejestrować użytkownika.");
+        }
+
+        await loadSession();
+
+        if (isMountedRef.current) {
+          setError(null);
+        }
+
+        return true;
+      } catch (authError) {
+        if (isMountedRef.current) {
+          setError(authError instanceof Error ? authError.message : "Nie udało się zarejestrować użytkownika.");
+          setLoading(false);
+        }
+
+        return false;
+      }
+    },
+    [loadSession]
+  );
 
   const signOut = useCallback(async () => {
     setLoading(true);
-    const { error: signOutError } = await supabaseClient.auth.signOut();
 
-    if (!isMountedRef.current) {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error ?? "Nie udało się wylogować.");
+      }
+
+      if (isMountedRef.current) {
+        setUser(null);
+        setError(null);
+        setLoading(false);
+      }
+
+      return true;
+    } catch (signOutError) {
+      if (isMountedRef.current) {
+        setError(signOutError instanceof Error ? signOutError.message : "Nie udało się wylogować.");
+        setLoading(false);
+      }
+
       return false;
     }
-
-    if (signOutError) {
-      setError(signOutError.message);
-      setLoading(false);
-      return false;
-    } else {
-      setError(null);
-      setUser(null);
-    }
-
-    setLoading(false);
-    return true;
   }, []);
 
   return { error, loading, resetError, signIn, signOut, signUp, user };

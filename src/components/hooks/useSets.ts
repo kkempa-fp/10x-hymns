@@ -46,8 +46,21 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
       });
 
       if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Nie udało się pobrać listy zestawów.");
+        let message = "Nie udało się pobrać listy zestawów.";
+
+        try {
+          const payload = (await response.clone().json()) as { error?: string };
+          if (typeof payload?.error === "string" && payload.error.trim().length > 0) {
+            message = payload.error.trim();
+          }
+        } catch {
+          const text = await response.text();
+          if (text.trim().length > 0) {
+            message = text.trim();
+          }
+        }
+
+        throw new Error(message);
       }
 
       const payload = (await response.json()) as ListSetsResponseDto;

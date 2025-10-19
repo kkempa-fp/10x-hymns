@@ -3,7 +3,6 @@ import { z } from "zod";
 
 import { createSetsService, SetServiceError } from "../../lib/services/sets.service.ts";
 import type { CreateSetCommand } from "../../types";
-import { DEFAULT_USER_ID } from "../../db/supabase.client.ts";
 
 const MAX_FIELD_LENGTH = 200;
 
@@ -48,9 +47,14 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals }) => {
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
+  }
+
+  if (!userId) {
+    return jsonResponse({ error: "Musisz być zalogowany, aby wyświetlać zestawy." }, 401);
   }
 
   let queryParams: z.infer<typeof listSetsSchema>;
@@ -67,10 +71,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
     return jsonResponse({ error: "Failed to process request" }, 500);
   }
 
-  const setsService = createSetsService(supabase);
-
   try {
-    const response = await setsService.list(DEFAULT_USER_ID, queryParams);
+    const response = await createSetsService(supabase).list(userId, queryParams);
     return jsonResponse(response, 200);
   } catch (unknownError) {
     if (unknownError instanceof SetServiceError) {
@@ -104,15 +106,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
   }
 
-  const setsService = createSetsService(supabase);
+  if (!userId) {
+    return jsonResponse({ error: "Musisz być zalogowany, aby tworzyć zestawy." }, 401);
+  }
 
   try {
-    const response = await setsService.create(DEFAULT_USER_ID, command);
+    const response = await createSetsService(supabase).create(userId, command);
     return jsonResponse(response, 201);
   } catch (unknownError) {
     if (unknownError instanceof SetServiceError) {

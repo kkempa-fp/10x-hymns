@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FC, t
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { supabaseClient } from "@/db/supabase.client";
+import { getSupabaseBrowserClient } from "@/db/supabase.client";
 import { resolveRequestError } from "@/lib/errors";
 import type {
   GenerateSuggestionsCommand,
@@ -17,6 +17,7 @@ const SUGGESTION_COUNT = 5;
 const FINGERPRINT_STORAGE_KEY = "10x-hymns:fingerprint";
 
 const SuggestionGenerator: FC = () => {
+  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState<SuggestionDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -132,7 +133,7 @@ const SuggestionGenerator: FC = () => {
           client_fingerprint: fingerprintValue,
         };
 
-        const { data: sessionData } = await supabaseClient.auth.getSession();
+        const { data: sessionData } = await supabase.auth.getSession();
         const accessToken = sessionData.session?.access_token;
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (accessToken) {
@@ -159,7 +160,7 @@ const SuggestionGenerator: FC = () => {
         setRatingLoading(false);
       }
     },
-    [fingerprint, ratingLoading, suggestions]
+    [fingerprint, ratingLoading, suggestions, supabase]
   );
 
   const isGenerateDisabled = loading || !text.trim();

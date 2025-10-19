@@ -13,15 +13,17 @@ import RegisterForm from "./RegisterForm";
 import SetsManager from "./SetsManager";
 import SuggestionGenerator from "./SuggestionGenerator";
 
+type AuthModalView = "login" | "register";
+
 const MainView: FC = () => {
   const { error: authError, loading: authLoading, resetError, signIn, signOut, signUp, user } = useAuth();
   const [activeTab, setActiveTab] = useState<"generator" | "sets">("generator");
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<"login" | "register">("login");
+  const [authModalView, setAuthModalView] = useState<AuthModalView>("login");
 
   const handleLoginClick = useCallback(() => {
     resetError();
-    setAuthModalTab("login");
+    setAuthModalView("login");
     setAuthModalOpen(true);
   }, [resetError]);
 
@@ -31,13 +33,14 @@ const MainView: FC = () => {
 
   const closeAuthModal = useCallback(() => {
     resetError();
+    setAuthModalView("login");
     setAuthModalOpen(false);
   }, [resetError]);
 
   const handleAuthTabChange = useCallback(
-    (tab: "login" | "register") => {
+    (view: AuthModalView) => {
       resetError();
-      setAuthModalTab(tab);
+      setAuthModalView(view);
     },
     [resetError]
   );
@@ -47,6 +50,7 @@ const MainView: FC = () => {
       const isSuccess = await signIn(values);
       if (isSuccess) {
         setAuthModalOpen(false);
+        setAuthModalView("login");
       }
 
       return isSuccess;
@@ -58,7 +62,7 @@ const MainView: FC = () => {
     async (values: AuthFormValues) => {
       const isSuccess = await signUp(values);
       if (isSuccess) {
-        setAuthModalTab("login");
+        setAuthModalView("login");
         setAuthModalOpen(false);
       }
 
@@ -103,11 +107,11 @@ const MainView: FC = () => {
         )}
       </main>
       <AuthModal
-        activeTab={authModalTab}
+        activeView={authModalView}
         isOpen={isAuthModalOpen}
         loginForm={<LoginForm error={authError} loading={authLoading} onSubmit={handleLoginSubmit} />}
         onClose={closeAuthModal}
-        onTabChange={handleAuthTabChange}
+        onViewChange={handleAuthTabChange}
         registerForm={<RegisterForm error={authError} loading={authLoading} onSubmit={handleRegisterSubmit} />}
       />
     </div>

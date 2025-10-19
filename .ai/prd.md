@@ -45,6 +45,7 @@ W zakres wersji MVP produktu NIE wchodzą następujące funkcjonalności:
 - Współdzielenie i udostępnianie zestawów pieśni między różnymi użytkownikami.
 - Automatyczne integracje z zewnętrznymi źródłami tekstów liturgicznych (np. brewiarz.pl, strony diecezjalne).
 - Dedykowane aplikacje mobilne na systemy iOS i Android.
+- Odzyskiwanie hasła oraz zmiana hasła poprzez linki e-mailowe.
 
 ## 5. Historyjki użytkowników
 
@@ -56,7 +57,7 @@ Kryteria akceptacji:
 - Formularz rejestracji zawiera pola na adres e-mail i hasło.
 - System waliduje poprawność formatu adresu e-mail.
 - System wymusza minimalną złożoność hasła.
-- Po pomyślnej rejestracji system wyświetla komunikat o konieczności potwierdzenia adresu e-mail, a na skrzynkę użytkownika wysyłany jest link weryfikacyjny.
+- Po pomyślnej rejestracji użytkownik zostaje zalogowany natychmiast i widzi komunikat o aktywnym koncie.
 - W przypadku próby rejestracji na istniejący już e-mail, system wyświetla czytelny komunikat o błędzie.
 
 ID: US-002

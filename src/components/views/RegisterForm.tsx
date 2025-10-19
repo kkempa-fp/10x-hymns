@@ -1,9 +1,11 @@
-import { useState, type ChangeEvent, type FC, type FormEvent } from "react";
+import { useEffect, useState, type FC } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { AuthFormValues } from "@/types";
+import { RegisterFormSchema, type AuthFormValues, type RegisterFormValues } from "@/types";
 
 interface RegisterFormProps {
   error: string | null;
@@ -11,103 +13,99 @@ interface RegisterFormProps {
   onSubmit: (values: AuthFormValues) => Promise<boolean>;
 }
 
-const INITIAL_VALUES: AuthFormValues = {
-  email: "",
-  password: "",
-};
-
 const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
-  const [values, setValues] = useState<AuthFormValues>(INITIAL_VALUES);
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    mode: "onBlur",
+  });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setLocalError(null);
-    setValues((prev) => ({ ...prev, [name]: value }));
+  useEffect(() => {
+    if (error) {
+      setError("root", { message: error });
+      setIsSuccess(false);
+      return;
+    }
+
+    clearErrors("root");
+  }, [clearErrors, error, setError]);
+
+  const submitHandler = async (values: RegisterFormValues) => {
+    const isCompleted = await onSubmit({ email: values.email, password: values.password });
+    if (!isCompleted) {
+      return;
+    }
+
+    reset();
+    setIsSuccess(true);
   };
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!values.email.trim() || !values.password.trim()) {
-      setLocalError("Podaj adres e-mail oraz hasło.");
-      return;
-    }
-
-    if (values.password.length < 6) {
-      setLocalError("Hasło musi mieć co najmniej 6 znaków.");
-      return;
-    }
-
-    if (values.password !== confirmPassword) {
-      setLocalError("Hasła muszą być identyczne.");
-      return;
-    }
-
-    setLocalError(null);
-    const isSuccess = await onSubmit(values);
-
-    if (isSuccess) {
-      setValues(INITIAL_VALUES);
-      setConfirmPassword("");
-    }
-  };
-
-  const activeError = localError ?? error;
-  const isSubmitDisabled =
-    loading || !values.email.trim() || !values.password.trim() || values.password !== confirmPassword;
+  const isBusy = loading || isSubmitting;
+  const rootError = errors.root?.message;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate>
       <div className="flex flex-col gap-2">
         <Label htmlFor="register-email">Adres e-mail</Label>
         <Input
           id="register-email"
-          name="email"
           type="email"
           autoComplete="email"
           placeholder="jan.kowalski@example.com"
-          value={values.email}
-          onChange={handleChange}
-          required
+          {...register("email")}
+          aria-invalid={Boolean(errors.email)}
         />
+        {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="register-password">Hasło</Label>
         <Input
           id="register-password"
-          name="password"
           type="password"
           autoComplete="new-password"
-          value={values.password}
-          onChange={handleChange}
-          minLength={6}
-          required
+          {...register("password")}
+          aria-invalid={Boolean(errors.password)}
         />
+        {errors.password ? <p className="text-sm text-destructive">{errors.password.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="register-password-confirm">Powtórz hasło</Label>
         <Input
           id="register-password-confirm"
-          name="confirmPassword"
           type="password"
           autoComplete="new-password"
-          value={confirmPassword}
-          onChange={(event) => {
-            setLocalError(null);
-            setConfirmPassword(event.target.value);
-          }}
-          minLength={6}
-          required
+          {...register("confirmPassword")}
+          aria-invalid={Boolean(errors.confirmPassword)}
         />
+        {errors.confirmPassword ? <p className="text-sm text-destructive">{errors.confirmPassword.message}</p> : null}
       </div>
 
-      {activeError ? <p className="text-sm text-destructive">{activeError}</p> : null}
+      {rootError ? <p className="text-sm text-destructive">{rootError}</p> : null}
+      {isSuccess ? (
+        <div className="rounded-[var(--md-sys-shape-corner-medium)] border border-accent/60 bg-accent/20 p-4 text-sm text-muted-foreground">
+          Konto zostało utworzone i jest już aktywne. Możesz się zalogować, aby korzystać z aplikacji.
+        </div>
+      ) : null}
 
-      <Button type="submit" disabled={isSubmitDisabled} className="w-full">
-        {loading ? "Rejestracja..." : "Załóż konto"}
+      <Button type="submit" disabled={isBusy} className="w-full">
+        {isBusy ? "Rejestracja..." : "Załóż konto"}
       </Button>
+
+      <p className="text-sm text-muted-foreground">
+        Rejestracja działa natychmiast – od razu po utworzeniu konta możesz logować się i zarządzać zestawami.
+      </p>
     </form>
   );
 };

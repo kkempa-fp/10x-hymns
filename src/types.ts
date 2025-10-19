@@ -109,6 +109,34 @@ export interface AuthFormValues {
   password: string;
 }
 
+export const LoginFormSchema = z
+  .object({
+    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
+    password: z.string().min(1, "Podaj hasło."),
+  })
+  .strict();
+
+export type LoginFormValues = z.infer<typeof LoginFormSchema>;
+
+export const RegisterFormSchema = LoginFormSchema.extend({
+  password: z
+    .string()
+    .min(8, "Hasło musi mieć co najmniej 8 znaków.")
+    .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
+    .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę."),
+  confirmPassword: z.string().min(1, "Potwierdź hasło."),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Hasła muszą być identyczne.",
+      path: ["confirmPassword"],
+    });
+  }
+});
+
+export type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
+
 export interface SetFormValues {
   content: string;
   name: string;

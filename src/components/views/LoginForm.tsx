@@ -1,9 +1,11 @@
-import { useState, type ChangeEvent, type FC, type FormEvent } from "react";
+import { useEffect, type FC } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { AuthFormValues } from "@/types";
+import { LoginFormSchema, type AuthFormValues, type LoginFormValues } from "@/types";
 
 interface LoginFormProps {
   error: string | null;
@@ -11,74 +13,81 @@ interface LoginFormProps {
   onSubmit: (values: AuthFormValues) => Promise<boolean>;
 }
 
-const INITIAL_VALUES: AuthFormValues = {
-  email: "",
-  password: "",
-};
-
 const LoginForm: FC<LoginFormProps> = ({ error, loading, onSubmit }) => {
-  const [values, setValues] = useState<AuthFormValues>(INITIAL_VALUES);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    clearErrors,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onBlur",
+  });
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setLocalError(null);
-    setValues((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!values.email.trim() || !values.password.trim()) {
-      setLocalError("Podaj adres e-mail oraz hasło.");
+  useEffect(() => {
+    if (error) {
+      setError("root", { message: error });
       return;
     }
 
-    setLocalError(null);
-    const isSuccess = await onSubmit(values);
+    clearErrors("root");
+  }, [clearErrors, error, setError]);
 
-    if (isSuccess) {
-      setValues(INITIAL_VALUES);
+  const submitHandler = async (values: LoginFormValues) => {
+    const isSuccess = await onSubmit({ email: values.email, password: values.password });
+    if (!isSuccess) {
+      return;
     }
+
+    reset();
   };
 
-  const activeError = localError ?? error;
-  const isSubmitDisabled = loading || !values.email.trim() || !values.password.trim();
+  const isBusy = loading || isSubmitting;
+  const rootError = errors.root?.message;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate>
       <div className="flex flex-col gap-2">
         <Label htmlFor="login-email">Adres e-mail</Label>
         <Input
           id="login-email"
-          name="email"
           type="email"
           autoComplete="email"
           placeholder="jan.kowalski@example.com"
-          value={values.email}
-          onChange={handleChange}
-          required
+          {...register("email")}
+          aria-invalid={Boolean(errors.email)}
         />
+        {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="login-password">Hasło</Label>
         <Input
           id="login-password"
-          name="password"
           type="password"
           autoComplete="current-password"
-          value={values.password}
-          onChange={handleChange}
-          minLength={6}
-          required
+          {...register("password")}
+          aria-invalid={Boolean(errors.password)}
         />
+        {errors.password ? <p className="text-sm text-destructive">{errors.password.message}</p> : null}
       </div>
 
-      {activeError ? <p className="text-sm text-destructive">{activeError}</p> : null}
+      {rootError ? <p className="text-sm text-destructive">{rootError}</p> : null}
 
-      <Button type="submit" disabled={isSubmitDisabled} className="w-full">
-        {loading ? "Logowanie..." : "Zaloguj się"}
-      </Button>
+      <div className="flex flex-col gap-3">
+        <Button type="submit" disabled={isBusy} className="w-full">
+          {isBusy ? "Logowanie..." : "Zaloguj się"}
+        </Button>
+      </div>
+
+      <p className="text-sm text-muted-foreground">
+        Logując się, akceptujesz regulamin i politykę prywatności aplikacji 10x Hymns.
+      </p>
     </form>
   );
 };
