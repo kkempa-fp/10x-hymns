@@ -21,10 +21,10 @@
 
 ## AI
 
-### Komunikacja z modelami przez usługę Openrouter.ai
+### Komunikacja z modelem generującym embeddingi
 
-- Dostęp do szerokiej gamy modeli (OpenAI, Anthropic, Google i wiele innych), które pozwolą nam znaleźć rozwiązanie zapewniające wysoką efektywność i niskie koszta
-- Pozwala na ustawianie limitów finansowych na klucze API
+- Integracja z dedykowanymi modelami embeddingowymi, umożliwiającymi generowanie wysokiej jakości wektorowych reprezentacji tekstu
+- Możliwość definiowania limitów finansowych oraz zarządzania kluczami API bezpośrednio po stronie dostawcy
 
 ## CI/CD i Hosting
 

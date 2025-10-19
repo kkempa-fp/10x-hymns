@@ -215,5 +215,5 @@ This document outlines the REST API for the 10x Hymns application, designed base
     - `name`: Must be a non-empty string. The database enforces uniqueness per user (`sets_user_name_ci_idx`). The API will return a `409 Conflict` error on violation.
   - `content`: Must be a string (required, non-empty).
 - **Business Logic Implementation**:
-  - **Hymn Suggestion**: The `/api/suggestions` endpoint will encapsulate the logic of calling an external service (like OpenRouter.ai) to get an embedding for the input text and then querying the `hymns` table using `pgvector`'s similarity search to find the closest matches.
+  - **Hymn Suggestion**: The `/api/suggestions` endpoint will encapsulate the logic of calling an internal service to get an embedding for the input text and then querying the `hymns` table using `pgvector`'s similarity search to find the closest matches.
   - **Set Name Search**: The `GET /api/sets` endpoint will use a `LIKE` or `ILIKE` query (or `pg_trgm` for better performance) to filter sets based on the `search` query parameter, implementing the case-insensitive "contains" search requirement.

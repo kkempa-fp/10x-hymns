@@ -2,7 +2,7 @@
 
 ## 1. Przegląd endpointa
 
-Endpoint POST `/api/suggestions` przyjmuje tekst liturgiczny i generuje listę propozycji pieśni na podstawie podobieństwa ich wektorów osadzających (embeddings). Aplikacja wysyła embedding tekstu do zewnętrznej usługi AI (OpenRouter.ai), a następnie wykonuje zapytanie similarity search w tabeli `hymns` z wykorzystaniem rozszerzenia `pgvector`.
+Endpoint POST `/api/suggestions` przyjmuje tekst liturgiczny i generuje listę propozycji pieśni na podstawie podobieństwa ich wektorów osadzających (embeddings). Aplikacja wysyła embedding tekstu do zewnętrznej usługi AI, a następnie wykonuje zapytanie similarity search w tabeli `hymns` z wykorzystaniem rozszerzenia `pgvector`.
 
 ## 2. Szczegóły żądania
 
@@ -68,7 +68,7 @@ const generateSuggestionsSchema = z.object({
    - Wywołanie serwisu `suggestion.service`.
 2. Service (`src/lib/services/suggestion.service`):
    - Funkcja `generate(command: GenerateSuggestionsCommand)`:
-     1. Wywołanie klienta OpenRouter.ai, przekazanie `text` i odebranie embeddingu.
+     1. Wywołanie API, przekazanie `text` i odebranie embeddingu.
      2. Zapytanie do Supabase/PostgreSQL:
         ```sql
         SELECT number, name, category
@@ -88,7 +88,7 @@ const generateSuggestionsSchema = z.object({
 - Walidacja:
   - Wczesne zwrócenie `400` przy niepoprawnych danych wejściowych.
 - Uwierzytelnianie zewnętrznej usługi AI:
-  - Przechowywać klucze API jako `import.meta.env.OPENROUTER_API_KEY`.
+  - Przechowywać klucze API jako `import.meta.env.AI_API_KEY`.
   - Obsługiwać limity i błędy sieciowe w serwisie.
 
 ## 7. Obsługa błędów
@@ -116,7 +116,7 @@ const generateSuggestionsSchema = z.object({
 2. Zdefiniować i wyeksportować Zod schema (`generateSuggestionsSchema`).
 3. Stworzyć DTO w `src/types.ts` (sprawdzić, czy już istnieją i ewentualnie dodać).
 4. Utworzyć serwis: `src/lib/services/suggestion.service` z metodą `generate`:
-   - Konfiguracja klienta OpenRouter.ai.
+   - Konfiguracja klienta AI API.
    - Metoda do pobierania embeddingów i zapytania do bazy.
 5. W route zaimportować schema, serwis i zaprogramować handler:
    - Walidacja input

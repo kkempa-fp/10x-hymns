@@ -27,7 +27,7 @@
 **Backend:**
 
 - Supabase (PostgreSQL) for data storage and authentication
-- AI integration via OpenRouter.ai API
+- AI integration with embedding model
 
 **CI/CD / Deployment:**
 
