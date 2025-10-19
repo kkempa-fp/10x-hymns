@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "../../db/supabase.client.ts";
 import type { GenerateSuggestionsCommand, GenerateSuggestionsResponseDto, SuggestionDto } from "../../types";
+import { embeddingService, EmbeddingServiceError } from "./embedding.service";
 
 const EMBEDDING_DIMENSION = 768;
 const DEFAULT_SUGGESTION_COUNT = 3;
@@ -21,21 +22,6 @@ export class SuggestionServiceError extends Error {
   }
 }
 
-const createDeterministicRng = (seed: number) => {
-  let state = seed || 1;
-  return () => {
-    state = (1664525 * state + 1013904223) % 0x100000000;
-    return state / 0x100000000;
-  };
-};
-
-const mockGenerateEmbedding = (text: string): number[] => {
-  const seed = Array.from(text).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const random = createDeterministicRng(seed);
-
-  return Array.from({ length: EMBEDDING_DIMENSION }, () => random() * 2 - 1);
-};
-
 const mapToSuggestionDto = (row: MatchHymnsRow): SuggestionDto => ({
   number: row.number,
   name: row.name,
@@ -44,7 +30,24 @@ const mapToSuggestionDto = (row: MatchHymnsRow): SuggestionDto => ({
 
 export const createSuggestionsService = (supabase: SupabaseClient) => {
   const generate = async (command: GenerateSuggestionsCommand): Promise<GenerateSuggestionsResponseDto> => {
-    const embedding = mockGenerateEmbedding(command.text);
+    let embedding: number[];
+
+    try {
+      const [vector] = await embeddingService.generateEmbeddings({
+        content: command.text,
+        taskType: "RETRIEVAL_QUERY",
+        outputDimensionality: EMBEDDING_DIMENSION,
+      });
+
+      embedding = vector;
+    } catch (error) {
+      if (error instanceof EmbeddingServiceError) {
+        throw new SuggestionServiceError(error.message, error.status, { cause: error.cause });
+      }
+
+      throw new SuggestionServiceError("Failed to generate query embedding", 502, { cause: error });
+    }
+
     const limit = command.count ?? DEFAULT_SUGGESTION_COUNT;
 
     const { data, error } = await supabase.rpc(MATCH_FUNCTION_NAME, {

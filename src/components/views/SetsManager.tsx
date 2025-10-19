@@ -9,6 +9,7 @@ import useSets from "../hooks/useSets";
 import DeleteSetDialog from "./DeleteSetDialog";
 import Pagination from "./Pagination";
 import SetFormModal from "./SetFormModal";
+import SetPreviewModal from "./SetPreviewModal";
 import SetsDataTable from "./SetsDataTable";
 
 import type { ListSetsQueryDto, SetDto, SetFormValues } from "@/types";
@@ -31,6 +32,11 @@ interface DeleteState {
   target: SetDto | null;
 }
 
+interface PreviewState {
+  isOpen: boolean;
+  target: SetDto | null;
+}
+
 const SetsManager: FC = () => {
   const { data, error: listError, loading: listLoading, query, refetch, setQuery } = useSets(DEFAULT_QUERY);
   const {
@@ -44,6 +50,7 @@ const SetsManager: FC = () => {
 
   const [formState, setFormState] = useState<FormState>({ isOpen: false, mode: "create", target: null });
   const [deleteState, setDeleteState] = useState<DeleteState>({ isOpen: false, target: null });
+  const [previewState, setPreviewState] = useState<PreviewState>({ isOpen: false, target: null });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const sets = data?.data ?? [];
@@ -133,6 +140,14 @@ const SetsManager: FC = () => {
     setFormState({ isOpen: false, mode: "create", target: null });
     resetError();
   }, [resetError]);
+
+  const openPreviewModal = useCallback((target: SetDto) => {
+    setPreviewState({ isOpen: true, target });
+  }, []);
+
+  const closePreviewModal = useCallback(() => {
+    setPreviewState({ isOpen: false, target: null });
+  }, []);
 
   const handleFormSubmit = useCallback(
     async (values: SetFormValues) => {
@@ -255,6 +270,7 @@ const SetsManager: FC = () => {
           loading={listLoading}
           onEdit={openEditModal}
           onDelete={openDeleteDialog}
+          onPreview={openPreviewModal}
           onSortChange={handleSortChange}
           sortField={currentSortField}
           sortOrder={currentSortOrder}
@@ -279,6 +295,8 @@ const SetsManager: FC = () => {
         onClose={closeFormModal}
         onSubmit={handleFormSubmit}
       />
+
+      <SetPreviewModal isOpen={previewState.isOpen} onClose={closePreviewModal} set={previewState.target} />
 
       <DeleteSetDialog
         error={deleteState.isOpen ? mutationError : null}

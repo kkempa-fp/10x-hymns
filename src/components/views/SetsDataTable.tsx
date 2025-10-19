@@ -7,6 +7,7 @@ interface SetsDataTableProps {
   loading: boolean;
   onDelete: (set: SetDto) => void;
   onEdit: (set: SetDto) => void;
+  onPreview: (set: SetDto) => void;
   onSortChange: (field: NonNullable<ListSetsQueryDto["sort"]>) => void;
   sortField: NonNullable<ListSetsQueryDto["sort"]>;
   sortOrder: NonNullable<ListSetsQueryDto["order"]>;
@@ -33,7 +34,7 @@ const renderContentPreview = (content: string | null) => {
     return "—";
   }
 
-  return content.length > 120 ? `${content.slice(0, 117)}...` : content;
+  return content.length > 100 ? `${content.slice(0, 97)}...` : content;
 };
 
 const sortIndicator = (isActive: boolean, order: "asc" | "desc") => {
@@ -48,6 +49,7 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
   loading,
   onDelete,
   onEdit,
+  onPreview,
   onSortChange,
   sortField,
   sortOrder,
@@ -123,11 +125,21 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
             </tr>
           ) : null}
           {sets.map((set) => (
-            <tr key={set.id} className="hover:bg-primary/5">
+            <tr
+              key={set.id}
+              className="cursor-pointer hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              onClick={() => onPreview(set)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onPreview(set);
+                }
+              }}
+              tabIndex={0}
+            >
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-col gap-1">
                   <span className="font-mono text-sm font-medium text-foreground">{set.name}</span>
-                  <span className="text-xs text-muted-foreground">ID: {set.id}</span>
                 </div>
               </td>
               <td className="px-4 py-4 align-top text-sm text-foreground/80">
@@ -138,10 +150,26 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
               </td>
               <td className="px-4 py-4 align-top">
                 <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => onEdit(set)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onEdit(set);
+                    }}
+                  >
                     Edytuj
                   </Button>
-                  <Button type="button" variant="destructive" size="sm" onClick={() => onDelete(set)}>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete(set);
+                    }}
+                  >
                     Usuń
                   </Button>
                 </div>

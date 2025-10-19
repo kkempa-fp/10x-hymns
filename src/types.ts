@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { Database } from "./db/database.types";
 
 // ------------------------------------------------------------------------------------------------
@@ -118,3 +119,39 @@ export interface AsyncState<TData> {
   error: string | null;
   loading: boolean;
 }
+
+// ------------------------------------------------------------------------------------------------
+// 6. Embedding Service Schemas
+// ------------------------------------------------------------------------------------------------
+const TASK_TYPES = [
+  "RETRIEVAL_QUERY",
+  "RETRIEVAL_DOCUMENT",
+  "SEMANTIC_SIMILARITY",
+  "CLASSIFICATION",
+  "CLUSTERING",
+] as const;
+
+export const TaskTypeSchema = z.enum(TASK_TYPES);
+
+export type TaskType = (typeof TASK_TYPES)[number];
+
+export const EmbeddingParamsSchema = z
+  .object({
+    content: z.union([
+      z.string().min(1, "content must not be empty"),
+      z
+        .array(z.string().min(1, "content entries must not be empty"))
+        .min(1, "content array must include at least one item"),
+    ]),
+    taskType: TaskTypeSchema.optional(),
+    title: z.string().min(1, "title must not be empty").optional(),
+    outputDimensionality: z
+      .number()
+      .int("outputDimensionality must be an integer")
+      .positive("outputDimensionality must be positive")
+      .max(768, "outputDimensionality exceeds model capabilities")
+      .optional(),
+  })
+  .strict();
+
+export type EmbeddingParams = z.infer<typeof EmbeddingParamsSchema>;
