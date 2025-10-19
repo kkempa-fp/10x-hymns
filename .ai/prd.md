@@ -56,7 +56,7 @@ Kryteria akceptacji:
 - Formularz rejestracji zawiera pola na adres e-mail i hasło.
 - System waliduje poprawność formatu adresu e-mail.
 - System wymusza minimalną złożoność hasła.
-- Po pomyślnej rejestracji użytkownik jest automatycznie zalogowany i widzi powiadomienie o sukcesie.
+- Po pomyślnej rejestracji system wyświetla komunikat o konieczności potwierdzenia adresu e-mail, a na skrzynkę użytkownika wysyłany jest link weryfikacyjny.
 - W przypadku próby rejestracji na istniejący już e-mail, system wyświetla czytelny komunikat o błędzie.
 
 ID: US-002
@@ -80,7 +80,7 @@ Kryteria akceptacji:
 
 ID: US-004
 Tytuł: Ocenianie propozycji
-Opis: Jako użytkownik, chcę móc ocenić zaproponowane pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół", aby wyrazić swoją opinię o trafności sugestii.
+Opis: Jako użytkownik (zalogowany lub nie), chcę móc ocenić zaproponowane pieśni za pomocą przycisków "łapka w górę" lub "łapka w dół", aby wyrazić swoją opinię o trafności sugestii.
 Kryteria akceptacji:
 
 - Obok listy zaproponowanych pieśni znajdują się dwa przyciski: "łapka w górę" i "łapka w dół".
