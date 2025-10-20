@@ -48,18 +48,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return jsonResponse({ error: "Failed to process request" }, 500);
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice("Bearer ".length).trim();
-    if (token) {
-      const { data: userData, error: userError } = await supabase.auth.getUser(token);
-      if (userError) {
-        return jsonResponse({ error: "Invalid authentication token" }, 401);
-      }
-
-      userId = userData.user?.id ?? null;
-    }
-  }
+  userId = locals.user?.id ?? null;
 
   const ratingsService = createRatingsService(supabase);
 

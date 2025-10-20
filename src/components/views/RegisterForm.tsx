@@ -1,11 +1,36 @@
-import { useEffect, useState, type FC } from "react";
+import { useEffect, type FC } from "react";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RegisterFormSchema, type AuthFormValues, type RegisterFormValues } from "@/types";
+import type { AuthFormValues } from "@/types";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Hasło musi mieć co najmniej 8 znaków.")
+  .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
+  .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę.");
+
+const registerFormSchema = z
+  .object({
+    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Potwierdź hasło."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Hasła muszą być identyczne.",
+        path: ["confirmPassword"],
+      });
+    }
+  });
+
+type RegisterFormValues = z.infer<typeof registerFormSchema>;
 
 interface RegisterFormProps {
   error: string | null;
@@ -14,7 +39,6 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
-  const [isSuccess, setIsSuccess] = useState(false);
   const {
     register,
     handleSubmit,
@@ -23,7 +47,7 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(RegisterFormSchema),
+    resolver: zodResolver(registerFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -35,7 +59,6 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
   useEffect(() => {
     if (error) {
       setError("root", { message: error });
-      setIsSuccess(false);
       return;
     }
 
@@ -49,7 +72,6 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
     }
 
     reset();
-    setIsSuccess(true);
   };
 
   const isBusy = loading || isSubmitting;
@@ -93,18 +115,14 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
       </div>
 
       {rootError ? <p className="text-sm text-destructive">{rootError}</p> : null}
-      {isSuccess ? (
-        <div className="rounded-[var(--md-sys-shape-corner-medium)] border border-accent/60 bg-accent/20 p-4 text-sm text-muted-foreground">
-          Konto zostało utworzone i jest już aktywne. Możesz się zalogować, aby korzystać z aplikacji.
-        </div>
-      ) : null}
 
       <Button type="submit" disabled={isBusy} className="w-full">
         {isBusy ? "Rejestracja..." : "Załóż konto"}
       </Button>
 
       <p className="text-sm text-muted-foreground">
-        Rejestracja działa natychmiast – od razu po utworzeniu konta możesz logować się i zarządzać zestawami.
+        Po rejestracji wyślemy do Ciebie wiadomość z linkiem aktywacyjnym. Zalogujesz się po potwierdzeniu adresu
+        e-mail.
       </p>
     </form>
   );

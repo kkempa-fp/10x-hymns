@@ -49,14 +49,15 @@ Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji
 - **Rola:** Spina widok główny aplikacji i zarządza stanem modala logowania/rejestracji.
 - **Logika:** Korzysta z hooka `useAuth` do pobierania informacji o sesji, deleguje obsługę logowania, rejestracji i wylogowania oraz przełącza zakładki modala.
 - **Renderowanie warunkowe:** Na podstawie obecności `user` z `useAuth` pokazuje panel zestawów lub sam generator.
+- **Obsługa potwierdzenia e-mail:** Wykrywa parametr `code` w adresie URL po kliknięciu linku aktywacyjnego i automatycznie otwiera modal logowania z komunikatem informacyjnym.
 
 #### 2.2.4. `src/components/views/LoginForm.tsx`
 
 - **Pola:** `email`, `password`.
 - **Walidacja (client-side):** Z użyciem `zod` i `react-hook-form` do sprawdzania podstawowej poprawności (np. czy pola nie są puste, poprawny format e-mail).
 - **Komunikacja:** Po walidacji, formularz wywołuje funkcję z hooka `useAuth`, która komunikuje się z endpointem Supabase.
-- **Obsługa błędów:** Wyświetlanie komunikatów o błędach zwróconych z backendu (np. "Nieprawidłowe dane logowania").
-- **Nawigacja:** Po pomyślnym zalogowaniu, modal jest zamykany, a stan aplikacji jest odświeżany w celu wyświetlenia widoku dla zalogowanego użytkownika.
+- **Obsługa błędów:** Wyświetlanie komunikatów o błędach zwróconych z backendu (np. "Nieprawidłowe dane logowania"). Komunikat pozostaje widoczny przy kolejnych próbach, dopóki żądanie nie powiedzie się.
+- **Nawigacja:** Po pomyślnym zalogowaniu modal jest zamykany, a widok przełącza się w stan użytkownika zalogowanego. Formularz nie udostępnia resetowania hasła.
 
 #### 2.2.5. `src/components/views/RegisterForm.tsx`
 
@@ -67,7 +68,7 @@ Modal będzie centralnym punktem interakcji użytkownika z systemem autentykacji
   - Sprawdzenie, czy hasła w obu polach są identyczne.
 - **Komunikacja:** Wywołanie funkcji z hooka `useAuth` w celu rejestracji w Supabase.
 - **Obsługa błędów:** Wyświetlanie komunikatów (np. "Użytkownik o tym adresie e-mail już istnieje").
-- **Nawigacja:** Po pomyślnej rejestracji modal zostaje zamknięty, a użytkownik jest automatycznie zalogowany i może korzystać z panelu zestawów bez dodatkowych kroków.
+- **Nawigacja:** Po pomyślnej rejestracji formularz czyści pola, automatycznie przełącza modal na zakładkę logowania i wyświetla komunikat o konieczności potwierdzenia adresu e-mail. Użytkownik musi zakończyć rejestrację poprzez kliknięcie linku w wiadomości e-mail i zalogować się samodzielnie.
 
 ### 2.3. Hooki (React)
 
@@ -77,10 +78,11 @@ Centralny hook do zarządzania logiką autentykacji po stronie klienta.
 
 - **Funkcje:**
   - `signIn(credentials)`: Loguje użytkownika poprzez wywołanie `/api/auth/login`.
-  - `signUp(credentials)`: Rejestruje nowego użytkownika poprzez `/api/auth/register`.
+  - `signUp(credentials)`: Rejestruje nowego użytkownika poprzez `/api/auth/register` i zwraca informację o wysłaniu maila potwierdzającego.
   - `signOut()`: Wylogowuje użytkownika poprzez `/api/auth/logout`.
   - `resetError()`: Czyści komunikaty błędów przed ponowną próbą.
   - Automatyczne `loadSession()`: Wywoływane po montażu i udanych operacjach, aby zsynchronizować stan z `/api/auth/session`.
+- **Zakres:** Hook nie obsługuje odzyskiwania hasła; taka funkcjonalność została świadomie pominięta.
 - **Zarządzanie stanem:** Hook lokalnie przechowuje `user`, `loading` i `error`, udostępniając je komponentom korzystającym z `useAuth`.
 
 ## 3. Logika Backendowa
@@ -103,7 +105,7 @@ Middleware będzie kluczowym elementem integracji z Supabase Auth.
 Warstwa API zapewnia cienkie kontrolery pośredniczące między klientem SPA a Supabase Auth. Kluczowe trasy:
 
 - `POST /api/auth/login` – deleguje do `supabase.auth.signInWithPassword()` i zwraca sesję.
-- `POST /api/auth/register` – wywołuje `supabase.auth.signUp()` i zwraca aktywne konto bez wymogu weryfikacji e-mail.
+- `POST /api/auth/register` – wywołuje `supabase.auth.signUp()`, a w odpowiedzi informuje użytkownika o konieczności potwierdzenia adresu e-mail przed pierwszym logowaniem.
 - `POST /api/auth/logout` – czyści sesję w Supabase.
 - `GET /api/auth/session` – odczytuje bieżącą sesję i zwraca dane użytkownika (lub `null`).
 
@@ -115,6 +117,7 @@ Plik `astro.config.mjs` zostanie zaktualizowany, aby włączyć renderowanie po 
 
 ## 4. System Autentykacji (Supabase)
 
-- **Rejestracja i Logowanie:** Warstwa API korzysta z `supabase.auth.signUp()` oraz `supabase.auth.signInWithPassword()`, a hook `useAuth` komunikuje się wyłącznie z endpointami `/api/auth/*`.
+- **Rejestracja i Logowanie:** Warstwa API korzysta z `supabase.auth.signUp()` (z włączonym potwierdzeniem e-mail) oraz `supabase.auth.signInWithPassword()`, a hook `useAuth` komunikuje się wyłącznie z endpointami `/api/auth/*`.
 - **Wylogowanie:** `POST /api/auth/logout` deleguje do `supabase.auth.signOut()` i czyści ciasteczka sesyjne.
 - **Zarządzanie sesją:** Supabase utrzymuje sesję w ciasteczkach httpOnly; middleware dopasowuje ją do `locals`, a `useAuth` odświeża stan klienta poprzez `/api/auth/session`.
+- **Brak resetu hasła:** Moduł nie udostępnia formularzy ani endpointów do inicjowania resetu hasła. W przypadku utraty dostępu użytkownik musi skontaktować się z administratorem.

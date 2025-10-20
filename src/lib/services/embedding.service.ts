@@ -4,7 +4,9 @@ import type {
   EmbedContentRequest,
   TaskType as GeminiTaskType,
 } from "@google/generative-ai";
-import { EmbeddingParamsSchema } from "../../types";
+import { z } from "zod";
+
+import { EMBEDDING_TASK_TYPES } from "../../types";
 import type { EmbeddingParams, TaskType } from "../../types";
 
 const EMBEDDING_MODEL_NAME = "gemini-embedding-001";
@@ -15,6 +17,25 @@ const RETRYABLE_STATUS_CODES = new Set([408, 409, 429, 500, 502, 503, 504]);
 const RETRYABLE_ERROR_CODES = new Set(["ECONNRESET", "ETIMEDOUT", "EAI_AGAIN"]);
 
 type EmbeddingModel = ReturnType<GoogleGenerativeAI["getGenerativeModel"]>;
+
+export const embeddingParamsSchema = z
+  .object({
+    content: z.union([
+      z.string().min(1, "content must not be empty"),
+      z
+        .array(z.string().min(1, "content entries must not be empty"))
+        .min(1, "content array must include at least one item"),
+    ]),
+    taskType: z.enum(EMBEDDING_TASK_TYPES).optional(),
+    title: z.string().min(1, "title must not be empty").optional(),
+    outputDimensionality: z
+      .number()
+      .int("outputDimensionality must be an integer")
+      .positive("outputDimensionality must be positive")
+      .max(768, "outputDimensionality exceeds model capabilities")
+      .optional(),
+  })
+  .strict();
 
 export class EmbeddingServiceError extends Error {
   readonly status: number;
@@ -42,7 +63,7 @@ export class EmbeddingService {
   }
 
   async generateEmbeddings(params: EmbeddingParams): Promise<number[][]> {
-    const validated = EmbeddingParamsSchema.parse(params);
+    const validated = embeddingParamsSchema.parse(params);
     const inputs = Array.isArray(validated.content) ? validated.content : [validated.content];
 
     if (!inputs.length) {

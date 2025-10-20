@@ -58,6 +58,10 @@ const AuthModal: FC<AuthModalProps> = ({ activeView, isOpen, loginForm, onClose,
   }
 
   const currentTab = activeView;
+  const headingMap: Record<AuthModalView, string> = {
+    login: "Zaloguj się",
+    register: "Załóż konto",
+  };
 
   const modalContent = (
     <div
@@ -67,7 +71,7 @@ const AuthModal: FC<AuthModalProps> = ({ activeView, isOpen, loginForm, onClose,
     >
       <div className="relative w-full max-w-xl rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-3)]">
         <div className="flex items-center justify-between">
-          <h2 className="text-[1.375rem] font-semibold leading-tight">Zaloguj się lub zarejestruj</h2>
+          <h2 className="text-[1.375rem] font-semibold leading-tight">{headingMap[currentTab]}</h2>
           <Button type="button" variant="ghost" onClick={onClose}>
             Zamknij
           </Button>

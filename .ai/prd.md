@@ -57,7 +57,7 @@ Kryteria akceptacji:
 - Formularz rejestracji zawiera pola na adres e-mail i hasło.
 - System waliduje poprawność formatu adresu e-mail.
 - System wymusza minimalną złożoność hasła.
-- Po pomyślnej rejestracji użytkownik zostaje zalogowany natychmiast i widzi komunikat o aktywnym koncie.
+- Po pomyślnej rejestracji system wyświetla komunikat o konieczności potwierdzenia adresu e-mail, a na skrzynkę użytkownika wysyłany jest link weryfikacyjny.
 - W przypadku próby rejestracji na istniejący już e-mail, system wyświetla czytelny komunikat o błędzie.
 
 ID: US-002

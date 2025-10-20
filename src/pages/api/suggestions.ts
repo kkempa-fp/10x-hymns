@@ -43,6 +43,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   const supabase = locals.supabase;
+  const userId = locals.user?.id ?? null;
 
   if (!supabase) {
     return jsonResponse({ error: "Supabase client not configured" }, 500);
@@ -51,7 +52,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const service = createSuggestionsService(supabase);
 
   try {
-    const response = await service.generate(command);
+    const response = await service.generate(command, { userId });
     return jsonResponse(response, 200);
   } catch (error) {
     if (error instanceof SuggestionServiceError) {

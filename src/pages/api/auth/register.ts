@@ -1,14 +1,36 @@
 import type { APIRoute } from "astro";
+import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
-import { RegisterFormSchema } from "@/types";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Hasło musi mieć co najmniej 8 znaków.")
+  .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
+  .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę.");
+
+const registerSchema = z
+  .object({
+    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Potwierdź hasło."),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Hasła muszą być identyczne.",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const payload = await request.json().catch(() => null);
 
-  const parsed = RegisterFormSchema.safeParse(payload);
+  const parsed = registerSchema.safeParse(payload);
   if (!parsed.success) {
     const message = parsed.error.issues.at(0)?.message ?? "Nieprawidłowe dane rejestracji.";
     return new Response(JSON.stringify({ error: message }), {
@@ -39,7 +61,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   return new Response(
     JSON.stringify({
       user: data.user,
-      message: "Konto zostało utworzone i jest aktywne.",
+      message: "Konto zostało utworzone. Wysłaliśmy wiadomość z linkiem aktywacyjnym.",
     }),
     {
       status: 200,

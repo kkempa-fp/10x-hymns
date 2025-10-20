@@ -2,7 +2,7 @@
 
 ## 1. Opis usługi
 
-`EmbeddingService` to usługa backendowa odpowiedzialna za generowanie wektorów embeddingów z danych tekstowych przy użyciu modelu `gemini-embedding-001` od Google. Usługa została zaprojektowana tak, aby hermetyzować logikę komunikacji z zewnętrznym API, walidację danych wejściowych, obsługę błędów oraz bezpieczne zarządzanie kluczami API. Umożliwia przetwarzanie zarówno pojedynczych zapytań, jak i zapytań wsadowych (batching).
+`EmbeddingService` to usługa backendowa odpowiedzialna za generowanie wektorów embeddingów z danych tekstowych przy użyciu modelu `gemini-embedding-001` od Google. Usługa została zaprojektowana tak, aby hermetyzować logikę komunikacji z zewnętrznym API, walidację danych wejściowych, obsługę błędów oraz bezpieczne zarządzanie kluczami API. Umożliwia przetwarzanie zarówno pojedynczych zapytań, jak i zapytań wsadowych (batching). W warstwie domenowej towarzyszy jej moduł `mock-embedding`, który umożliwia generowanie deterministycznych wektorów demo dla niezalogowanych użytkowników bez angażowania usługi Google.
 
 ## 2. Opis konstruktora
 
@@ -39,7 +39,7 @@ Usługa implementuje kompleksową obsługę błędów, aby zapewnić stabilnoś�
 ## 6. Kwestie bezpieczeństwa
 
 1.  **Zarządzanie kluczami API:** Klucz API do usługi Google AI **musi** być przechowywany jako zmienna środowiskowa (`GOOGLE_API_KEY`) na serwerze. Nigdy nie powinien być on umieszczany bezpośrednio w kodzie ani eksponowany po stronie klienta. W Astro dostęp do niego uzyskujemy poprzez `import.meta.env.GOOGLE_API_KEY`.
-2.  **Ograniczanie dostępu:** Endpointy API wykorzystujące `EmbeddingService` powinny być zabezpieczone, np. poprzez mechanizmy autentykacji i autoryzacji (jeśli dotyczy), aby zapobiec nieautoryzowanemu użyciu i potencjalnemu wyczerpaniu limitów API.
+2.  **Ograniczanie dostępu:** Endpointy API wykorzystujące `EmbeddingService` powinny dopuszczać kosztowne wywołania tylko dla zalogowanych użytkowników. Wdrażamy fallback do deterministycznych wektorów mockujących dla gości, co eliminuje ryzyko nadużyć i niepotrzebnego zużycia limitów API.
 3.  **Walidacja danych wejściowych:** Użycie Zod do walidacji wszystkich danych wejściowych chroni przed atakami typu injection oraz zapewnia, że do API Google trafiają tylko poprawne dane.
 
 ## 7. Plan wdrożenia krok po kroku
@@ -51,7 +51,8 @@ Usługa implementuje kompleksową obsługę błędów, aby zapewnić stabilnoś�
 5.  **Integracja z API Astro:** Stwórz nowy plik endpointu API w `src/pages/api/embed.ts`. Endpoint ten powinien:
     - Obsługiwać żądania `POST`.
     - Pobierać i parsować ciało żądania w formacie JSON.
-    - Wywoływać metodę `generateEmbeddings` na współdzielonej instancji `embeddingService`.
-    - Implementować obsługę błędów w bloku `try...catch`, zwracając odpowiednie kody statusu HTTP (np. 200 dla sukcesu, 400 dla błędnych danych wejściowych, 500 dla błędów serwera).
+    - Sprawdzić `locals.user` – brak użytkownika oznacza zwrócenie wektorów demo (`createMockEmbeddings`).
+    - Dla zalogowanych użytkowników wywołać metodę `generateEmbeddings` na współdzielonej instancji `embeddingService`.
+    - Implementować obsługę błędów w bloku `try...catch`, zwracając odpowiednie kody statusu HTTP (np. 200 dla sukcesu, 400 dla błędnych danych wejściowych, 500 dla błędów serwera) oraz `meta.mode` informujące o trybie.
     - Zwracać wygenerowane embeddingi w formacie JSON w przypadku powodzenia.
     - Posiadać flagę `export const prerender = false;`, aby zapewnić dynamiczne renderowanie po stronie serwera.

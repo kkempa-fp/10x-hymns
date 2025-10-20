@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 
-import { embeddingService, EmbeddingServiceError } from "../../lib/services/embedding.service";
-import { EmbeddingParamsSchema } from "../../types";
+import { embeddingParamsSchema, embeddingService, EmbeddingServiceError } from "../../lib/services/embedding.service";
+import { createMockEmbeddings } from "../../lib/services/mock-embedding";
 
 const jsonResponse = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {
@@ -11,7 +11,7 @@ const jsonResponse = (body: unknown, status: number) =>
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   let payload: unknown;
 
   try {
@@ -20,15 +20,22 @@ export const POST: APIRoute = async ({ request }) => {
     return jsonResponse({ error: "Invalid JSON payload" }, 400);
   }
 
-  const parseResult = EmbeddingParamsSchema.safeParse(payload);
+  const parseResult = embeddingParamsSchema.safeParse(payload);
 
   if (!parseResult.success) {
     return jsonResponse({ errors: parseResult.error.format() }, 400);
   }
 
+  const isAuthenticated = Boolean(locals.user?.id);
+
+  if (!isAuthenticated) {
+    const demoVectors = createMockEmbeddings(parseResult.data.content);
+    return jsonResponse({ data: demoVectors, meta: { mode: "demo" } }, 200);
+  }
+
   try {
     const embeddings = await embeddingService.generateEmbeddings(parseResult.data);
-    return jsonResponse({ data: embeddings }, 200);
+    return jsonResponse({ data: embeddings, meta: { mode: "full" } }, 200);
   } catch (error) {
     if (error instanceof EmbeddingServiceError) {
       return jsonResponse({ error: error.message }, error.status);

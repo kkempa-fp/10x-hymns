@@ -74,6 +74,8 @@ const createSetSchema = z.object({
 
 2. Service (`src/lib/services/sets.service.ts`):
 
+- Dodatkowe metody (`list`, `getById`, `update`, `remove`) muszą weryfikować właściciela rekordu. Jeśli zestaw istnieje, ale `user_id` nie zgadza się z identyfikatorem zalogowanego użytkownika, serwis rzuca `SetServiceError` z kodem `403`.
+
 - Metoda `create(userId: string, cmd: CreateSetCommand)`:
   1. Wywołanie Supabase client:
 
@@ -92,7 +94,8 @@ const createSetSchema = z.object({
 ## 6. Względy bezpieczeństwa
 
 - Autoryzacja: middleware `src/middleware/index.ts` zapewnia `401` dla nieautoryzowanych.
-- RLS w bazie wymusza, że użytkownik może czytać/edytować tylko swoje rekordy.
+- Serwis aplikacyjny jawnie sprawdza własność rekordu przed odczytem/edycją/usuwaniem i zwraca `403`, gdy zestaw należy do innego użytkownika.
+- RLS w bazie nadal pozostaje aktywne jako dodatkowa linia obrony.
 - Walidacja inputu w Zod zapobiega wstrzyknięciom.
 - Użycie Prepared Statements przez Supabase JS SDK.
 

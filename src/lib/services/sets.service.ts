@@ -16,8 +16,10 @@ import type {
 } from "../../types";
 
 const SET_SELECT_COLUMNS = "id,name,content,created_at,updated_at" as const;
+const SET_SELECT_COLUMNS_WITH_OWNER = "id,name,content,created_at,updated_at,user_id" as const;
 
 type SetRow = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
+type SetRowWithOwner = SetRow & { user_id: string };
 
 export class SetServiceError extends Error {
   readonly status: number;
@@ -43,6 +45,51 @@ const isUniqueConstraintViolation = (error: PostgrestError | null) => error?.cod
 
 export const createSetsService = (supabase: SupabaseClient) => {
   type NormalizedListQuery = { search?: string } & Required<Omit<ListSetsQueryDto, "search">>;
+
+  const fetchSetWithOwner = async (setId: string): Promise<SetRowWithOwner | null> => {
+    const { data, error } = await supabase
+      .from("sets")
+      .select(SET_SELECT_COLUMNS_WITH_OWNER)
+      .eq("id", setId)
+      .maybeSingle();
+
+    if (error) {
+      throw new SetServiceError("Unable to fetch set", 500, { cause: error });
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const typed = data as Set;
+    const setRow: SetRow = {
+      id: typed.id,
+      name: typed.name,
+      content: typed.content,
+      created_at: typed.created_at,
+      updated_at: typed.updated_at,
+    };
+
+    return { ...setRow, user_id: typed.user_id } satisfies SetRowWithOwner;
+  };
+
+  const assertOwnership = async (userId: string, setId: string): Promise<SetRowWithOwner> => {
+    if (!userId) {
+      throw new SetServiceError("User context is required", 400);
+    }
+
+    const record = await fetchSetWithOwner(setId);
+
+    if (!record) {
+      throw new SetServiceError("Set not found", 404);
+    }
+
+    if (record.user_id !== userId) {
+      throw new SetServiceError("You are not allowed to access this set", 403);
+    }
+
+    return record;
+  };
 
   const applyQueryDefaults = (query: ListSetsQueryDto = {}): NormalizedListQuery => {
     const page = query.page && query.page > 0 ? query.page : 1;
@@ -130,37 +177,17 @@ export const createSetsService = (supabase: SupabaseClient) => {
   };
 
   const getById = async (userId: string, setId: string): Promise<GetSetResponseDto> => {
-    if (!userId) {
-      throw new SetServiceError("User context is required", 400);
-    }
+    const record = await assertOwnership(userId, setId);
 
-    const { data, error } = await supabase
-      .from("sets")
-      .select(SET_SELECT_COLUMNS)
-      .eq("user_id", userId)
-      .eq("id", setId)
-      .maybeSingle();
-
-    if (error) {
-      throw new SetServiceError("Unable to fetch set", 500, { cause: error });
-    }
-
-    if (!data) {
-      throw new SetServiceError("Set not found", 404);
-    }
-
-    return { data: mapToSetDto(data) } satisfies GetSetResponseDto;
+    return { data: mapToSetDto(record) } satisfies GetSetResponseDto;
   };
 
   const update = async (userId: string, setId: string, command: UpdateSetCommand): Promise<UpdateSetResponseDto> => {
-    if (!userId) {
-      throw new SetServiceError("User context is required", 400);
-    }
+    await assertOwnership(userId, setId);
 
     const { data, error } = await supabase
       .from("sets")
       .update(command)
-      .eq("user_id", userId)
       .eq("id", setId)
       .select(SET_SELECT_COLUMNS)
       .single();
@@ -181,11 +208,9 @@ export const createSetsService = (supabase: SupabaseClient) => {
   };
 
   const remove = async (userId: string, setId: string): Promise<DeleteSetResponseDto> => {
-    if (!userId) {
-      throw new SetServiceError("User context is required", 400);
-    }
+    await assertOwnership(userId, setId);
 
-    const { error } = await supabase.from("sets").delete().eq("user_id", userId).eq("id", setId);
+    const { error } = await supabase.from("sets").delete().eq("id", setId);
 
     if (error) {
       if (error.code === "PGRST116" || error.code === "42501") {

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FC } from "react";
 
 import type { AuthFormValues } from "@/types";
@@ -20,9 +20,11 @@ const MainView: FC = () => {
   const [activeTab, setActiveTab] = useState<"generator" | "sets">("generator");
   const [isAuthModalOpen, setAuthModalOpen] = useState(false);
   const [authModalView, setAuthModalView] = useState<AuthModalView>("login");
+  const [authInfo, setAuthInfo] = useState<string | null>(null);
 
   const handleLoginClick = useCallback(() => {
     resetError();
+    setAuthInfo(null);
     setAuthModalView("login");
     setAuthModalOpen(true);
   }, [resetError]);
@@ -33,6 +35,7 @@ const MainView: FC = () => {
 
   const closeAuthModal = useCallback(() => {
     resetError();
+    setAuthInfo(null);
     setAuthModalView("login");
     setAuthModalOpen(false);
   }, [resetError]);
@@ -40,6 +43,9 @@ const MainView: FC = () => {
   const handleAuthTabChange = useCallback(
     (view: AuthModalView) => {
       resetError();
+      if (view === "register") {
+        setAuthInfo(null);
+      }
       setAuthModalView(view);
     },
     [resetError]
@@ -49,6 +55,7 @@ const MainView: FC = () => {
     async (values: AuthFormValues) => {
       const isSuccess = await signIn(values);
       if (isSuccess) {
+        setAuthInfo(null);
         setAuthModalOpen(false);
         setAuthModalView("login");
       }
@@ -62,14 +69,41 @@ const MainView: FC = () => {
     async (values: AuthFormValues) => {
       const isSuccess = await signUp(values);
       if (isSuccess) {
+        setAuthInfo(
+          "Na podany adres e-mail wysłaliśmy link aktywacyjny. Kliknij w niego, aby dokończyć rejestrację i zalogować się."
+        );
         setAuthModalView("login");
-        setAuthModalOpen(false);
       }
 
       return isSuccess;
     },
     [signUp]
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const hasVerificationCode = params.has("code");
+
+    if (!hasVerificationCode) {
+      return;
+    }
+
+    if (!user) {
+      resetError();
+      setAuthInfo("Adres e-mail został potwierdzony. Zaloguj się, aby rozpocząć korzystanie z aplikacji.");
+      setAuthModalView("login");
+      setAuthModalOpen(true);
+    }
+
+    params.delete("code");
+    const nextQuery = params.toString();
+    const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${window.location.hash}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [resetError, user]);
 
   return (
     <div className="surface-primary flex min-h-screen flex-col">
@@ -100,16 +134,20 @@ const MainView: FC = () => {
                 </button>
               ))}
             </div>
-            {activeTab === "generator" ? <SuggestionGenerator /> : <SetsManager />}
+            {activeTab === "generator" ? (
+              <SuggestionGenerator authLoading={authLoading} user={user} />
+            ) : (
+              <SetsManager />
+            )}
           </section>
         ) : (
-          <SuggestionGenerator />
+          <SuggestionGenerator authLoading={authLoading} user={user} />
         )}
       </main>
       <AuthModal
         activeView={authModalView}
         isOpen={isAuthModalOpen}
-        loginForm={<LoginForm error={authError} loading={authLoading} onSubmit={handleLoginSubmit} />}
+        loginForm={<LoginForm error={authError} info={authInfo} loading={authLoading} onSubmit={handleLoginSubmit} />}
         onClose={closeAuthModal}
         onViewChange={handleAuthTabChange}
         registerForm={<RegisterForm error={authError} loading={authLoading} onSubmit={handleRegisterSubmit} />}

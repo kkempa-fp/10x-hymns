@@ -4,31 +4,41 @@ stateDiagram-v2
 
     WidokNiezalogowany: Użytkownik niezalogowany
     note left of WidokNiezalogowany
-        Dostępny tylko generator sugestii.
+        Użytkownik widzi generator propozycji.
+        Może generować i oceniać sugestie.
     end note
 
     WidokNiezalogowany --> FormularzLogowania: Kliknięcie "Zaloguj się"
     WidokNiezalogowany --> FormularzRejestracji: Kliknięcie "Zarejestruj się"
 
     state "Proces Autentykacji" as Autentykacja {
-        FormularzLogowania --> WalidacjaLogowania: Wysłanie formularza
+        FormularzLogowania --> SprawdzenieDanych: Wprowadzenie danych
 
-        state WalidacjaLogowania <<choice>>
-        WalidacjaLogowania --> WidokZalogowany: Dane poprawne (sesja istnieje)
-        WalidacjaLogowania --> FormularzLogowania: Dane błędne
+        state SprawdzenieDanych <<choice>>
+        SprawdzenieDanych --> WidokZalogowany: Dane poprawne
+        SprawdzenieDanych --> FormularzLogowania: Dane błędne
 
-        FormularzRejestracji --> WalidacjaRejestracji: Wysłanie formularza
+        FormularzRejestracji --> WalidacjaDanych: Wysłanie formularza
 
-        state WalidacjaRejestracji <<choice>>
-        WalidacjaRejestracji --> WidokZalogowany: Dane poprawne (natychmiastowe logowanie)
-        WalidacjaRejestracji --> FormularzRejestracji: Dane błędne
+        state WalidacjaDanych <<choice>>
+        WalidacjaDanych --> OczekiwanieNaWeryfikacje: Dane poprawne
+        WalidacjaDanych --> FormularzRejestracji: Dane błędne
+
+        OczekiwanieNaWeryfikacje: Oczekiwanie na weryfikację e-mail
+        note right of OczekiwanieNaWeryfikacje
+            Użytkownik musi kliknąć link
+            w e-mailu weryfikacyjnym.
+        end note
+        OczekiwanieNaWeryfikacje --> FormularzLogowania: E-mail zweryfikowany
     }
 
     WidokZalogowany: Panel zalogowanego użytkownika
-    note right of WidokZalogowany
-        Generator + panel zarządzania zestawami.
+    note left of WidokZalogowany
+        Użytkownik widzi generator propozycji
+        oraz panel zarządzania zestawami.
     end note
 
     WidokZalogowany --> WidokNiezalogowany: Wylogowanie
     WidokZalogowany --> [*]
+
 ```

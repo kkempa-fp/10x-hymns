@@ -4,6 +4,11 @@
 
 Endpoint POST `/api/suggestions` przyjmuje tekst liturgiczny i generuje listę propozycji pieśni na podstawie podobieństwa ich wektorów osadzających (embeddings). Aplikacja wysyła embedding tekstu do zewnętrznej usługi AI, a następnie wykonuje zapytanie similarity search w tabeli `hymns` z wykorzystaniem rozszerzenia `pgvector`.
 
+Wersja produkcyjna wspiera dwa tryby pracy:
+
+- **full** – dostępny dla zalogowanych użytkowników; wykorzystuje prawdziwe embeddingi Gemini.
+- **demo** – dostępny dla gości; wykorzystuje deterministyczne wektory mockujące, aby pokazać działanie bez kosztów API.
+
 ## 2. Szczegóły żądania
 
 - Metoda HTTP: POST
@@ -39,9 +44,15 @@ const generateSuggestionsSchema = z.object({
   type SuggestionDto = Pick<Hymn, "number" | "name" | "category">;
   ```
 - GenerateSuggestionsResponseDto (DTO output):
+
   ```ts
+  type SuggestionsMode = "full" | "demo";
+
   interface GenerateSuggestionsResponseDto {
     data: SuggestionDto[];
+    meta: {
+      mode: SuggestionsMode;
+    };
   }
   ```
 
@@ -57,34 +68,45 @@ const generateSuggestionsSchema = z.object({
     "data": [
       { "number": "string", "name": "string", "category": "string" }
       // ...
-    ]
+    ],
+    "meta": {
+      "mode": "full" | "demo"
+    }
   }
   ```
+  Klient może na podstawie `meta.mode` komunikować użytkownikowi, czy wynik pochodzi z prawdziwego modelu AI, czy z wersji demonstracyjnej.
 
 ## 5. Przepływ danych
 
 1. API route w `src/pages/api/suggestions.ts`:
-   - Parsowanie i walidacja żądania za pomocą Zod.
-   - Wywołanie serwisu `suggestion.service`.
-2. Service (`src/lib/services/suggestion.service`):
-   - Funkcja `generate(command: GenerateSuggestionsCommand)`:
-     1. Wywołanie API, przekazanie `text` i odebranie embeddingu.
-     2. Zapytanie do Supabase/PostgreSQL:
-        ```sql
-        SELECT number, name, category
-        FROM hymns
-        ORDER BY embedding <=> $1
-        LIMIT $2;
-        ```
-     3. Mapowanie wyniku na `SuggestionDto[]`.
-   - Zwraca `GenerateSuggestionsResponseDto`.
+
+- Parsowanie i walidacja żądania za pomocą Zod.
+- Odczyt `locals.user?.id`, przekazanie go do serwisu.
+- Wywołanie serwisu `suggestions.service`.
+
+2. Service (`src/lib/services/suggestions.service.ts`):
+
+- Funkcja `generate(command: GenerateSuggestionsCommand, options?: { userId?: string | null })`:
+  1. Dla zalogowanych (`options.userId`) – pobranie embeddingu z Gemini.
+  2. Dla gości – wygenerowanie deterministycznego wektora mockującego (`createMockEmbeddingVector`).
+  3. Zapytanie do Supabase/PostgreSQL:
+     ```sql
+     SELECT number, name, category
+     FROM hymns
+     ORDER BY embedding <=> $1
+     LIMIT $2;
+     ```
+  4. Mapowanie wyniku na `SuggestionDto[]`.
+- Zwraca `GenerateSuggestionsResponseDto`.
+
 3. Obsluga błędów w serwisie i propagacja wyjątków do API route.
 
 ## 6. Względy bezpieczeństwa
 
 - Autoryzacja:
-  - Jeśli endpoint ma być chroniony, wymagać nagłówka `Authorization` z tokenem Supabase JWT.
-  - Weryfikować sesję w middleware `src/middleware/index.ts` i odrzucać nieautoryzowane żądania (`401`).
+  - Endpoint jest publiczny, ale tylko zalogowani użytkownicy wywołują kosztowne embeddingi.
+  - Middleware Supabase dostarcza `locals.user`; jego brak powoduje przełączenie w tryb demo bez błędu.
+  - Programistyczne integracje mogą nadal wysyłać token w nagłówku `Authorization`.
 - Walidacja:
   - Wczesne zwrócenie `400` przy niepoprawnych danych wejściowych.
 - Uwierzytelnianie zewnętrznej usługi AI:
@@ -97,7 +119,7 @@ const generateSuggestionsSchema = z.object({
   - Brak `text` albo pusty string.
   - `count` nie jest liczbą dodatnią.
 - 401 Unauthorized:
-  - Brak lub nieprawidłowy token (jeśli chronimy endpoint).
+  - Nie dotyczy domyślnej wersji (goście trafiają do trybu demo), ale może wystąpić, jeśli wymusimy autoryzację w przyszłości.
 - 500 Internal Server Error:
   - Błąd generowania embeddingu (timeout, niepoprawna odpowiedź).
   - Błąd zapytania SQL (np. błąd bazy, brak rozszerzenia `pgvector`).

@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { Database } from "./db/database.types";
 
 // ------------------------------------------------------------------------------------------------
@@ -26,9 +25,13 @@ export interface GenerateSuggestionsCommand {
 }
 
 export type SuggestionDto = Pick<Hymn, "number" | "name" | "category">;
+export type SuggestionsMode = "full" | "demo";
 
 export interface GenerateSuggestionsResponseDto {
   data: SuggestionDto[];
+  meta: {
+    mode: SuggestionsMode;
+  };
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -109,34 +112,6 @@ export interface AuthFormValues {
   password: string;
 }
 
-export const LoginFormSchema = z
-  .object({
-    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
-    password: z.string().min(1, "Podaj hasło."),
-  })
-  .strict();
-
-export type LoginFormValues = z.infer<typeof LoginFormSchema>;
-
-export const RegisterFormSchema = LoginFormSchema.extend({
-  password: z
-    .string()
-    .min(8, "Hasło musi mieć co najmniej 8 znaków.")
-    .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
-    .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę."),
-  confirmPassword: z.string().min(1, "Potwierdź hasło."),
-}).superRefine((data, ctx) => {
-  if (data.password !== data.confirmPassword) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Hasła muszą być identyczne.",
-      path: ["confirmPassword"],
-    });
-  }
-});
-
-export type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
-
 export interface SetFormValues {
   content: string;
   name: string;
@@ -149,9 +124,9 @@ export interface AsyncState<TData> {
 }
 
 // ------------------------------------------------------------------------------------------------
-// 6. Embedding Service Schemas
+// 6. Embedding Service Types
 // ------------------------------------------------------------------------------------------------
-const TASK_TYPES = [
+export const EMBEDDING_TASK_TYPES = [
   "RETRIEVAL_QUERY",
   "RETRIEVAL_DOCUMENT",
   "SEMANTIC_SIMILARITY",
@@ -159,27 +134,11 @@ const TASK_TYPES = [
   "CLUSTERING",
 ] as const;
 
-export const TaskTypeSchema = z.enum(TASK_TYPES);
+export type TaskType = (typeof EMBEDDING_TASK_TYPES)[number];
 
-export type TaskType = (typeof TASK_TYPES)[number];
-
-export const EmbeddingParamsSchema = z
-  .object({
-    content: z.union([
-      z.string().min(1, "content must not be empty"),
-      z
-        .array(z.string().min(1, "content entries must not be empty"))
-        .min(1, "content array must include at least one item"),
-    ]),
-    taskType: TaskTypeSchema.optional(),
-    title: z.string().min(1, "title must not be empty").optional(),
-    outputDimensionality: z
-      .number()
-      .int("outputDimensionality must be an integer")
-      .positive("outputDimensionality must be positive")
-      .max(768, "outputDimensionality exceeds model capabilities")
-      .optional(),
-  })
-  .strict();
-
-export type EmbeddingParams = z.infer<typeof EmbeddingParamsSchema>;
+export interface EmbeddingParams {
+  content: string | string[];
+  taskType?: TaskType;
+  title?: string;
+  outputDimensionality?: number;
+}

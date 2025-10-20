@@ -15,7 +15,7 @@ This document outlines the REST API for the 10x Hymns application, designed base
 
 #### POST /api/suggestions
 
-- **Description**: Generates a list of hymn suggestions based on a provided text. It computes the embedding for the text and finds the most similar hymns from the database.
+- **Description**: Generates a list of hymn suggestions based on a provided text. Authenticated requests use live Gemini embeddings, while anonymous guests receive deterministic demo vectors. The response exposes the active mode via `meta.mode`.
 - **Request Body**:
   ```json
   {
@@ -24,7 +24,7 @@ This document outlines the REST API for the 10x Hymns application, designed base
   }
   ```
 - **Response Body (Success)**:
-  ```json
+  ```
   {
     "data": [
       {
@@ -32,7 +32,10 @@ This document outlines the REST API for the 10x Hymns application, designed base
         "name": "string",
         "category": "string"
       }
-    ]
+    ],
+    "meta": {
+      "mode": "full" | "demo"
+    }
   }
   ```
 - **Success Codes**:
@@ -40,6 +43,8 @@ This document outlines the REST API for the 10x Hymns application, designed base
 - **Error Codes**:
   - `400 Bad Request`: The request body is invalid (e.g., missing `text`).
   - `500 Internal Server Error`: An error occurred during embedding generation or database query.
+
+  > **Notes**: When `meta.mode` is `demo`, the payload is deterministic and no paid API calls are made. Clients should encourage users to authenticate to unlock the `full` mode.
 
 ### 2.2. Ratings
 
@@ -191,13 +196,37 @@ This document outlines the REST API for the 10x Hymns application, designed base
   - `404 Not Found`: The set with the specified ID was not found.
   - `500 Internal Server Error`: Failed to delete the set.
 
+### 2.4. Embeddings
+
+#### POST /api/embed
+
+- **Description**: Generates embedding vectors for supplied content. Authenticated callers receive real Gemini embeddings; unauthenticated requests are served mock vectors for demo purposes.
+- **Request Body**: Matches `EmbeddingParams` (see embedding service plan).
+- **Response Body (Success)**:
+  ```json
+  {
+    "data": [[0.1, 0.2, "..." ]],
+    "meta": {
+      "mode": "full" | "demo"
+    }
+  }
+  ```
+- **Success Codes**:
+  - `200 OK`: Embeddings (real or demo) generated successfully.
+- **Error Codes**:
+  - `400 Bad Request`: Invalid payload.
+  - `401 Unauthorized`: Session missing for full mode requests (mock data still returned when unauthenticated).
+  - `500/502`: Upstream embedding service failure.
+
+> **Notes**: This endpoint is intended for internal use. Consider adding rate limiting before production deployment.
+
 ## 3. Authentication and Authorization
 
-- **Mechanism**: Authentication will be handled using JSON Web Tokens (JWT) provided by Supabase Auth. The client is responsible for acquiring, storing, and sending the JWT with each authenticated request.
+- **Mechanism**: Authentication is managed by Supabase Auth sessions stored in secure HTTP-only cookies. JWT bearer headers remain supported for programmatic access.
 - **Implementation**:
-  - The client will send the JWT in the `Authorization` header as a Bearer token: `Authorization: Bearer <your-supabase-jwt>`.
-  - Astro middleware (`src/middleware/index.ts`) will intercept incoming requests, validate the JWT using the Supabase client, and attach the user's session information to `Astro.locals`.
-  - API endpoints that require authentication will check for a valid user session in `Astro.locals`. If no session is found, a `401 Unauthorized` error will be returned.
+  - Astro middleware (`src/middleware/index.ts`) instantiates a Supabase server client using incoming cookies/headers and attaches `locals.user` / `locals.session` for downstream handlers.
+  - When a route requires authentication, it checks `locals.user`; absence results in `401 Unauthorized` or `403 Forbidden` (when resources exist but belong to another user).
+  - Authenticated fetches from the browser should include `credentials: "include"` to propagate the session cookie.
 - **Authorization**: Row-Level Security (RLS) policies in the Supabase database will enforce authorization. API endpoints will rely on these policies to ensure users can only access or modify their own data (e.g., their own `sets`).
 
 ## 4. Validation and Business Logic

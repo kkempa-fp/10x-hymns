@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FC, type FormEvent } from "react";
+import type { User } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,7 +17,12 @@ import type {
 const SUGGESTION_COUNT = 5;
 const FINGERPRINT_STORAGE_KEY = "10x-hymns:fingerprint";
 
-const SuggestionGenerator: FC = () => {
+interface SuggestionGeneratorProps {
+  authLoading?: boolean;
+  user?: User | null;
+}
+
+const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false, user = null }) => {
   const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState<SuggestionDto[]>([]);
@@ -43,6 +49,12 @@ const SuggestionGenerator: FC = () => {
     window.localStorage.setItem(FINGERPRINT_STORAGE_KEY, generated);
     setFingerprint(generated);
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setLastRating(null);
+    }
+  }, [user]);
 
   const suggestionsAsText = useMemo(() => {
     if (suggestions.length === 0) {
@@ -96,7 +108,12 @@ const SuggestionGenerator: FC = () => {
 
       const data = (await response.json()) as GenerateSuggestionsResponseDto;
       setSuggestions(data.data);
-      setStatusMessage(`Otrzymano ${data.data.length} propozycji.`);
+      setStatusMessage(
+        data.meta.mode === "full"
+          ? `Otrzymano ${data.data.length} dopasowanych propozycji od modelu AI.`
+          : "Tryb demo: pokazujemy przykładowe propozycje. Zaloguj się, aby odblokować pełne rekomendacje."
+      );
+      setError(null);
     } catch (requestError) {
       const message = resolveRequestError(requestError, "Wystąpił nieznany błąd.");
       setError(message);
@@ -165,6 +182,7 @@ const SuggestionGenerator: FC = () => {
 
   const isGenerateDisabled = loading || !text.trim();
   const isRatingDisabled = suggestions.length === 0 || ratingLoading || lastRating !== null;
+  const resolvedAuthState = authLoading ? null : Boolean(user);
 
   return (
     <section className="surface-raised rounded-[var(--md-sys-shape-corner-extra-large)] border border-border p-6">
@@ -174,6 +192,20 @@ const SuggestionGenerator: FC = () => {
           Wpisz fragment liturgii lub temat przewodni, a my zaproponujemy pieśni pasujące do Twojej celebracji.
         </p>
       </header>
+
+      {resolvedAuthState === null ? null : (
+        <div
+          className={`mt-4 rounded-lg border px-4 py-3 text-sm ${
+            resolvedAuthState
+              ? "border-primary/30 bg-primary/5 text-primary"
+              : "border-border bg-muted/40 text-muted-foreground"
+          }`}
+        >
+          {resolvedAuthState
+            ? "Jesteś zalogowany. Generator korzysta z embeddingów Google Gemini dla najtrafniejszych podpowiedzi."
+            : "Korzystasz z wersji demo – prezentujemy przykładowe propozycje. Zaloguj się, aby włączyć pełną wersję z embeddingami."}
+        </div>
+      )}
 
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
         <div className="flex flex-col gap-2">
@@ -192,7 +224,11 @@ const SuggestionGenerator: FC = () => {
             {loading ? "Generowanie..." : "Generuj propozycje"}
           </Button>
           <span className="text-[0.9375rem] text-muted-foreground">
-            Otrzymasz {SUGGESTION_COUNT} dopasowanych pieśni na podstawie danych z bazy.
+            {resolvedAuthState === null
+              ? `Otrzymasz ${SUGGESTION_COUNT} propozycji, gdy tylko zakończymy generowanie.`
+              : resolvedAuthState
+                ? `Otrzymasz ${SUGGESTION_COUNT} dopasowanych pieśni wygenerowanych przez model AI.`
+                : `Tryb demo zwraca ${SUGGESTION_COUNT} przykładowych pieśni. Zaloguj się, aby uzyskać dokładniejsze wyniki.`}
           </span>
         </div>
       </form>

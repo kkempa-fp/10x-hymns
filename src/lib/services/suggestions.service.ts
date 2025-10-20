@@ -1,8 +1,13 @@
 import type { SupabaseClient } from "../../db/supabase.client.ts";
-import type { GenerateSuggestionsCommand, GenerateSuggestionsResponseDto, SuggestionDto } from "../../types";
+import type {
+  GenerateSuggestionsCommand,
+  GenerateSuggestionsResponseDto,
+  SuggestionDto,
+  SuggestionsMode,
+} from "../../types";
+import { EMBEDDING_DIMENSION } from "./embedding.constants";
 import { embeddingService, EmbeddingServiceError } from "./embedding.service";
-
-const EMBEDDING_DIMENSION = 768;
+import { createMockEmbeddingVector } from "./mock-embedding";
 const DEFAULT_SUGGESTION_COUNT = 3;
 const MATCH_FUNCTION_NAME = "match_hymns" as const;
 const MATCH_COUNT_PARAM = "match_count";
@@ -29,23 +34,31 @@ const mapToSuggestionDto = (row: MatchHymnsRow): SuggestionDto => ({
 });
 
 export const createSuggestionsService = (supabase: SupabaseClient) => {
-  const generate = async (command: GenerateSuggestionsCommand): Promise<GenerateSuggestionsResponseDto> => {
+  const generate = async (
+    command: GenerateSuggestionsCommand,
+    options?: { userId?: string | null }
+  ): Promise<GenerateSuggestionsResponseDto> => {
+    const useAuthenticatedEmbedding = Boolean(options?.userId);
     let embedding: number[];
 
-    try {
-      const [vector] = await embeddingService.generateEmbeddings({
-        content: command.text,
-        taskType: "RETRIEVAL_QUERY",
-        outputDimensionality: EMBEDDING_DIMENSION,
-      });
+    if (useAuthenticatedEmbedding) {
+      try {
+        const [vector] = await embeddingService.generateEmbeddings({
+          content: command.text,
+          taskType: "RETRIEVAL_QUERY",
+          outputDimensionality: EMBEDDING_DIMENSION,
+        });
 
-      embedding = vector;
-    } catch (error) {
-      if (error instanceof EmbeddingServiceError) {
-        throw new SuggestionServiceError(error.message, error.status, { cause: error.cause });
+        embedding = vector;
+      } catch (error) {
+        if (error instanceof EmbeddingServiceError) {
+          throw new SuggestionServiceError(error.message, error.status, { cause: error.cause });
+        }
+
+        throw new SuggestionServiceError("Failed to generate query embedding", 502, { cause: error });
       }
-
-      throw new SuggestionServiceError("Failed to generate query embedding", 502, { cause: error });
+    } else {
+      embedding = createMockEmbeddingVector(command.text, EMBEDDING_DIMENSION);
     }
 
     const limit = command.count ?? DEFAULT_SUGGESTION_COUNT;
@@ -60,8 +73,12 @@ export const createSuggestionsService = (supabase: SupabaseClient) => {
     }
 
     const suggestions = (data ?? []).map(mapToSuggestionDto);
+    const mode: SuggestionsMode = useAuthenticatedEmbedding ? "full" : "demo";
 
-    return { data: suggestions } satisfies GenerateSuggestionsResponseDto;
+    return {
+      data: suggestions,
+      meta: { mode },
+    } satisfies GenerateSuggestionsResponseDto;
   };
 
   return { generate };
