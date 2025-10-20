@@ -102,8 +102,24 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
       });
 
       if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Nie udało się pobrać sugestii. Spróbuj ponownie.");
+        let errorMessage = "Nie udało się pobrać sugestii. Spróbuj ponownie.";
+        try {
+          const errorJson = await response.json();
+          if (
+            errorJson &&
+            errorJson.error === "Failed to generate embeddings" &&
+            errorJson.details === "Upstream service error"
+          ) {
+            errorMessage =
+              "Nie udało się wygenerować propozycji, ponieważ usługa AI jest tymczasowo niedostępna. Spróbuj ponownie za kilka minut lub skontaktuj się z administratorem.";
+          } else if (errorJson.error) {
+            errorMessage = errorJson.error;
+          }
+        } catch {
+          const message = await response.text();
+          if (message) errorMessage = message;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = (await response.json()) as GenerateSuggestionsResponseDto;
