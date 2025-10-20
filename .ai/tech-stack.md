@@ -30,3 +30,14 @@
 
 - Github Actions do tworzenia pipeline’ów CI/CD
 - DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+
+## Testowanie
+
+### Testy jednostkowe i integracyjne
+
+- Vitest jako nowoczesny i szybki framework do testów jednostkowych i integracyjnych
+- React Testing Library do testowania komponentów React w sposób zbliżony do interakcji użytkownika
+
+### Testy End-to-End
+
+- Playwright do automatyzacji testów E2E w różnych przeglądarkach, zapewniając kompleksową weryfikację przepływów użytkownika

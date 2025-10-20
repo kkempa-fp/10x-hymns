@@ -34,6 +34,11 @@
 - GitHub Actions for continuous integration and deployment
 - DigitalOcean for hosting using Docker images
 
+**Testing:**
+
+- Vitest & React Testing Library for unit and integration tests
+- Playwright for end-to-end tests
+
 ## Getting Started Locally
 
 ### Prerequisites
