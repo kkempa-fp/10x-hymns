@@ -1,6 +1,9 @@
-const NETWORK_ERROR_MESSAGE = "Nie udało się połączyć z serwerem. Sprawdź połączenie z internetem i spróbuj ponownie.";
+import { messages } from "./messages";
 
-export const resolveRequestError = (error: unknown, fallback: string) => {
+const NETWORK_ERROR_MESSAGE = messages.common.errors.network;
+const DEFAULT_FALLBACK_MESSAGE = messages.common.errors.unknown;
+
+export const resolveRequestError = (error: unknown, fallback: string = DEFAULT_FALLBACK_MESSAGE) => {
   if (error instanceof TypeError) {
     return NETWORK_ERROR_MESSAGE;
   }

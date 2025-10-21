@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState, type ChangeEvent, type FC } from "react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { messages } from "@/lib/messages";
 import useSetMutation from "../hooks/useSetMutation";
 import useSets from "../hooks/useSets";
 
@@ -155,7 +156,7 @@ const SetsManager: FC = () => {
         const result = await updateSet(formState.target.id, values);
         if (result) {
           closeFormModal();
-          setStatusMessage("Zestaw został zaktualizowany.");
+          setStatusMessage(messages.sets.manager.statusUpdated);
           await refetch();
           return true;
         }
@@ -165,7 +166,7 @@ const SetsManager: FC = () => {
       const created = await createSet(values);
       if (created) {
         closeFormModal();
-        setStatusMessage("Zestaw został utworzony.");
+        setStatusMessage(messages.sets.manager.statusCreated);
         setQuery((previous) => ({
           ...previous,
           page: 1,
@@ -206,7 +207,7 @@ const SetsManager: FC = () => {
     }
 
     closeDeleteDialog();
-    setStatusMessage("Zestaw został usunięty.");
+    setStatusMessage(messages.sets.manager.statusDeleted);
 
     if (shouldGoBack) {
       setQuery((previous) => ({
@@ -226,13 +227,11 @@ const SetsManager: FC = () => {
     <section className="flex flex-col gap-6" data-test-id="sets-manager">
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-[1.375rem] font-semibold leading-tight">Zarządzanie zestawami</h2>
-          <p className="text-[0.9375rem] text-muted-foreground">
-            Przechowuj zestawy pieśni, aby łatwo korzystać z nich podczas przygotowania liturgii.
-          </p>
+          <h2 className="text-[1.375rem] font-semibold leading-tight">{messages.sets.manager.title}</h2>
+          <p className="text-[0.9375rem] text-muted-foreground">{messages.sets.manager.description}</p>
         </div>
         <Button type="button" onClick={openCreateModal} data-test-id="sets-create-button">
-          Dodaj zestaw
+          {messages.sets.manager.createButton}
         </Button>
       </header>
 
@@ -240,17 +239,17 @@ const SetsManager: FC = () => {
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="flex w-full flex-col gap-1 md:max-w-sm">
             <Label htmlFor="sets-search" className="text-foreground">
-              Wyszukaj zestaw
+              {messages.sets.manager.searchLabel}
             </Label>
             <Input
               id="sets-search"
               type="search"
-              placeholder="Szukaj po nazwie..."
+              placeholder={messages.sets.manager.searchPlaceholder}
               value={query.search ?? ""}
               onChange={handleSearchChange}
             />
           </div>
-          <div className="text-[0.9375rem] text-muted-foreground">Łącznie {totalSets} zestawów</div>
+          <div className="text-[0.9375rem] text-muted-foreground">{messages.sets.manager.totalCount(totalSets)}</div>
         </div>
 
         {statusMessage ? (
@@ -262,7 +261,7 @@ const SetsManager: FC = () => {
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             <p>{listError}</p>
             <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => void refetch()}>
-              Spróbuj ponownie
+              {messages.common.buttons.retry}
             </Button>
           </div>
         ) : null}

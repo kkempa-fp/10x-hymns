@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import { MoonStar, SunMedium } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 
 type ResolvedTheme = Extract<ThemeMode, "light" | "dark">;
 
 const LABELS: Record<ResolvedTheme, string> = {
-  light: "Jasny",
-  dark: "Ciemny",
+  light: messages.theme.label.light,
+  dark: messages.theme.label.dark,
 };
 
 const ICONS: Record<ResolvedTheme, typeof SunMedium> = {
@@ -81,11 +82,13 @@ const ThemeToggle = () => {
       size="sm"
       onClick={cycleMode}
       className="gap-2"
-      aria-label={`Przełącz motyw (obecnie ${label})`}
+      aria-label={messages.theme.ariaLabel(label)}
     >
       <Icon className="size-4" aria-hidden="true" />
-      <span className="hidden sm:inline text-[0.8125rem]">Motyw: {label}</span>
-      <span className="sr-only">Przełącz motyw, aktualnie {label}</span>
+      <span className="hidden sm:inline text-[0.8125rem]">
+        {messages.theme.buttonPrefix} {label}
+      </span>
+      <span className="sr-only">{messages.theme.srLabel(label)}</span>
     </Button>
   );
 };

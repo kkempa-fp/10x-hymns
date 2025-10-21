@@ -1,6 +1,7 @@
 import type { FC } from "react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 
 interface PaginationProps {
   isDisabled?: boolean;
@@ -29,15 +30,13 @@ const Pagination: FC<PaginationProps> = ({ isDisabled = false, onPageChange, pag
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-      <p className="text-[0.9375rem] text-muted-foreground">
-        Strona {clampedPage} z {safeTotal}
-      </p>
+      <p className="text-[0.9375rem] text-muted-foreground">{messages.pagination.summary(clampedPage, safeTotal)}</p>
       <div className="flex items-center gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={handlePrevious} disabled={!canGoBack}>
-          Poprzednia
+          {messages.pagination.previous}
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={handleNext} disabled={!canGoForward}>
-          Następna
+          {messages.pagination.next}
         </Button>
       </div>
     </div>

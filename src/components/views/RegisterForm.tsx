@@ -6,25 +6,26 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { messages } from "@/lib/messages";
 import type { AuthFormValues } from "@/types";
 
 const passwordSchema = z
   .string()
-  .min(8, "Hasło musi mieć co najmniej 8 znaków.")
-  .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
-  .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę.");
+  .min(8, messages.auth.validation.passwordMin)
+  .regex(/[A-Z]/, messages.auth.validation.passwordUppercase)
+  .regex(/[0-9]/, messages.auth.validation.passwordDigit);
 
 const registerFormSchema = z
   .object({
-    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
+    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, "Potwierdź hasło."),
+    confirmPassword: z.string().min(1, messages.auth.validation.confirmPasswordRequired),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Hasła muszą być identyczne.",
+        message: messages.auth.validation.passwordsMismatch,
         path: ["confirmPassword"],
       });
     }
@@ -80,19 +81,19 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="register-email">Adres e-mail</Label>
+        <Label htmlFor="register-email">{messages.auth.register.emailLabel}</Label>
         <Input
           id="register-email"
           type="email"
           autoComplete="email"
-          placeholder="jan.kowalski@example.com"
+          placeholder={messages.common.placeholders.email}
           {...register("email")}
           aria-invalid={Boolean(errors.email)}
         />
         {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="register-password">Hasło</Label>
+        <Label htmlFor="register-password">{messages.auth.register.passwordLabel}</Label>
         <Input
           id="register-password"
           type="password"
@@ -103,7 +104,7 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
         {errors.password ? <p className="text-sm text-destructive">{errors.password.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="register-password-confirm">Powtórz hasło</Label>
+        <Label htmlFor="register-password-confirm">{messages.auth.register.confirmPasswordLabel}</Label>
         <Input
           id="register-password-confirm"
           type="password"
@@ -117,13 +118,10 @@ const RegisterForm: FC<RegisterFormProps> = ({ error, loading, onSubmit }) => {
       {rootError ? <p className="text-sm text-destructive">{rootError}</p> : null}
 
       <Button type="submit" disabled={isBusy} className="w-full">
-        {isBusy ? "Rejestracja..." : "Załóż konto"}
+        {isBusy ? messages.common.loading.registering : messages.auth.register.submit}
       </Button>
 
-      <p className="text-sm text-muted-foreground">
-        Po rejestracji wyślemy do Ciebie wiadomość z linkiem aktywacyjnym. Zalogujesz się po potwierdzeniu adresu
-        e-mail.
-      </p>
+      <p className="text-sm text-muted-foreground">{messages.auth.register.footer}</p>
     </form>
   );
 };

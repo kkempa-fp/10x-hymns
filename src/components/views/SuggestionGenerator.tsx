@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getSupabaseBrowserClient } from "@/db/supabase.client";
 import { resolveRequestError } from "@/lib/errors";
+import { messages } from "@/lib/messages";
 import type {
   GenerateSuggestionsCommand,
   GenerateSuggestionsResponseDto,
@@ -77,7 +78,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
 
   const handleGenerate = useCallback(async () => {
     if (!text.trim()) {
-      setError("Wpisz krótki opis liturgii, aby otrzymać sugestie.");
+      setError(messages.suggestion.requireInput);
       return;
     }
 
@@ -102,7 +103,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
       });
 
       if (!response.ok) {
-        let errorMessage = "Nie udało się pobrać sugestii. Spróbuj ponownie.";
+        let errorMessage: string = messages.common.errors.fetchSuggestionsFailed;
         try {
           const errorJson = await response.json();
           if (
@@ -110,8 +111,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             errorJson.error === "Failed to generate embeddings" &&
             errorJson.details === "Upstream service error"
           ) {
-            errorMessage =
-              "Nie udało się wygenerować propozycji, ponieważ usługa AI jest tymczasowo niedostępna. Spróbuj ponownie za kilka minut lub skontaktuj się z administratorem.";
+            errorMessage = messages.suggestion.errors.upstreamUnavailable;
           } else if (errorJson.error) {
             errorMessage = errorJson.error;
           }
@@ -125,13 +125,11 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
       const data = (await response.json()) as GenerateSuggestionsResponseDto;
       setSuggestions(data.data);
       setStatusMessage(
-        data.meta.mode === "full"
-          ? `Otrzymano ${data.data.length} dopasowanych propozycji od modelu AI.`
-          : "Tryb demo: pokazujemy przykładowe propozycje. Zaloguj się, aby odblokować pełne rekomendacje."
+        data.meta.mode === "full" ? messages.suggestion.status.full(data.data.length) : messages.suggestion.status.demo
       );
       setError(null);
     } catch (requestError) {
-      const message = resolveRequestError(requestError, "Wystąpił nieznany błąd.");
+      const message = resolveRequestError(requestError, messages.common.errors.unknown);
       setError(message);
       setSuggestions([]);
     } finally {
@@ -181,13 +179,15 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
 
         if (!response.ok) {
           const message = await response.text();
-          throw new Error(message || "Nie udało się zapisać oceny. Spróbuj ponownie.");
+          throw new Error(message || messages.common.errors.submitRatingFailed);
         }
 
-        setStatusMessage(rating === "up" ? "Dziękujemy za pozytywną opinię!" : "Zapisaliśmy Twoją uwagę.");
+        setStatusMessage(
+          rating === "up" ? messages.suggestion.status.ratingPositive : messages.suggestion.status.ratingNegative
+        );
         setLastRating(rating);
       } catch (requestError) {
-        const message = resolveRequestError(requestError, "Wystąpił nieznany błąd.");
+        const message = resolveRequestError(requestError, messages.common.errors.unknown);
         setError(message);
       } finally {
         setRatingLoading(false);
@@ -206,10 +206,8 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
       data-test-id="suggestion-generator"
     >
       <header className="flex flex-col gap-1">
-        <h2 className="text-[1.375rem] font-semibold leading-tight">Generator sugestii pieśni</h2>
-        <p className="text-[0.9375rem] text-muted-foreground">
-          Wpisz fragment liturgii lub temat przewodni, a my zaproponujemy pieśni pasujące do Twojej celebracji.
-        </p>
+        <h2 className="text-[1.375rem] font-semibold leading-tight">{messages.suggestion.title}</h2>
+        <p className="text-[0.9375rem] text-muted-foreground">{messages.suggestion.description}</p>
       </header>
 
       {resolvedAuthState === null ? null : (
@@ -220,18 +218,16 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
               : "border-border bg-muted/40 text-muted-foreground"
           }`}
         >
-          {resolvedAuthState
-            ? "Jesteś zalogowany. Generator korzysta z embeddingów Google Gemini dla najtrafniejszych podpowiedzi."
-            : "Korzystasz z wersji demo – prezentujemy przykładowe propozycje. Zaloguj się, aby włączyć pełną wersję z embeddingami."}
+          {resolvedAuthState ? messages.suggestion.banner.loggedIn : messages.suggestion.banner.guest}
         </div>
       )}
 
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="suggestion-input">Treść antyfony lub czytań</Label>
+          <Label htmlFor="suggestion-input">{messages.suggestion.form.inputLabel}</Label>
           <Textarea
             id="suggestion-input"
-            placeholder="Tutaj wklej lub wpisz tekst antyfony, czytań lub krótki opis liturgii..."
+            placeholder={messages.common.placeholders.suggestionInput}
             value={text}
             onChange={handleTextChange}
             disabled={loading}
@@ -241,21 +237,21 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
 
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={isGenerateDisabled} data-test-id="suggestion-submit-button">
-            {loading ? "Generowanie..." : "Generuj propozycje"}
+            {loading ? messages.common.loading.generating : messages.suggestion.form.generate}
           </Button>
           <span className="text-[0.9375rem] text-muted-foreground">
             {resolvedAuthState === null
-              ? `Otrzymasz ${SUGGESTION_COUNT} propozycji, gdy tylko zakończymy generowanie.`
+              ? messages.suggestion.counts.pending(SUGGESTION_COUNT)
               : resolvedAuthState
-                ? `Otrzymasz ${SUGGESTION_COUNT} dopasowanych pieśni wygenerowanych przez model AI.`
-                : `Tryb demo zwraca ${SUGGESTION_COUNT} przykładowych pieśni. Zaloguj się, aby uzyskać dokładniejsze wyniki.`}
+                ? messages.suggestion.counts.full(SUGGESTION_COUNT)
+                : messages.suggestion.counts.demo(SUGGESTION_COUNT)}
           </span>
         </div>
       </form>
 
       <div className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="suggestion-output">Proponowane pieśni</Label>
+          <Label htmlFor="suggestion-output">{messages.suggestion.form.outputLabel}</Label>
           <Textarea
             id="suggestion-output"
             value={suggestionsAsText}
@@ -274,7 +270,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             aria-pressed={lastRating === "up"}
             data-test-id="suggestion-rate-up"
           >
-            👍 Dobre propozycje
+            {messages.suggestion.rating.buttons.up}
           </Button>
           <Button
             type="button"
@@ -284,11 +280,12 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             aria-pressed={lastRating === "down"}
             data-test-id="suggestion-rate-down"
           >
-            👎 Nietrafione sugestie
+            {messages.suggestion.rating.buttons.down}
           </Button>
           {lastRating ? (
             <span className="text-[0.9375rem] text-muted-foreground">
-              Ostatnia ocena: {lastRating === "up" ? "pozytywna" : "negatywna"}
+              {messages.suggestion.rating.lastPrefix}{" "}
+              {lastRating === "up" ? messages.suggestion.rating.lastPositive : messages.suggestion.rating.lastNegative}
             </span>
           ) : null}
         </div>

@@ -2,34 +2,35 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
+import { messages } from "@/lib/messages";
 
 const loginSchema = z
   .object({
-    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
-    password: z.string().min(1, "Podaj hasło."),
+    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
+    password: z.string().min(1, messages.auth.validation.passwordRequired),
   })
   .strict();
 
 const resolveAuthErrorMessage = (message: string | null | undefined) => {
   if (!message) {
-    return "Nie udało się zalogować.";
+    return messages.auth.errors.loginFailed;
   }
 
   const normalized = message.toLowerCase();
 
   if (normalized.includes("invalid login credentials")) {
-    return "Nieprawidłowy adres e-mail lub hasło.";
+    return messages.auth.errors.invalidCredentials;
   }
 
   if (normalized.includes("email not confirmed")) {
-    return "Adres e-mail nie został jeszcze potwierdzony. Sprawdź skrzynkę pocztową.";
+    return messages.auth.errors.emailNotConfirmed;
   }
 
   if (normalized.includes("over email otp rate limit")) {
-    return "Zbyt wiele prób logowania. Spróbuj ponownie za chwilę.";
+    return messages.auth.errors.tooManyLoginAttempts;
   }
 
-  return message;
+  return messages.auth.errors.loginFailed;
 };
 
 export const prerender = false;
@@ -39,7 +40,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const parsed = loginSchema.safeParse(payload);
   if (!parsed.success) {
-    const message = parsed.error.issues.at(0)?.message ?? "Nieprawidłowe dane logowania.";
+    const message = parsed.error.issues.at(0)?.message ?? messages.auth.errors.invalidPayload;
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -62,7 +63,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   return new Response(
     JSON.stringify({
       user: data.user,
-      message: "Zalogowano pomyślnie.",
+      message: messages.auth.success.login,
     }),
     {
       status: 200,

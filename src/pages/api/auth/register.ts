@@ -2,24 +2,25 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
+import { messages } from "@/lib/messages";
 
 const passwordSchema = z
   .string()
-  .min(8, "Hasło musi mieć co najmniej 8 znaków.")
-  .regex(/[A-Z]/, "Hasło powinno zawierać przynajmniej jedną wielką literę.")
-  .regex(/[0-9]/, "Hasło powinno zawierać przynajmniej jedną cyfrę.");
+  .min(8, messages.auth.validation.passwordMin)
+  .regex(/[A-Z]/, messages.auth.validation.passwordUppercase)
+  .regex(/[0-9]/, messages.auth.validation.passwordDigit);
 
 const registerSchema = z
   .object({
-    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
+    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, "Potwierdź hasło."),
+    confirmPassword: z.string().min(1, messages.auth.validation.confirmPasswordRequired),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Hasła muszą być identyczne.",
+        message: messages.auth.validation.passwordsMismatch,
         path: ["confirmPassword"],
       });
     }
@@ -32,7 +33,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const parsed = registerSchema.safeParse(payload);
   if (!parsed.success) {
-    const message = parsed.error.issues.at(0)?.message ?? "Nieprawidłowe dane rejestracji.";
+    const message = parsed.error.issues.at(0)?.message ?? messages.auth.errors.invalidRegisterPayload;
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -45,14 +46,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error?.message && error.message.includes("User already registered")) {
-    return new Response(JSON.stringify({ error: "Użytkownik z tym adresem e-mail już istnieje." }), {
+    return new Response(JSON.stringify({ error: messages.auth.errors.userAlreadyExists }), {
       status: 409,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: messages.auth.errors.registerFailed }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
@@ -61,7 +62,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   return new Response(
     JSON.stringify({
       user: data.user,
-      message: "Konto zostało utworzone. Wysłaliśmy wiadomość z linkiem aktywacyjnym.",
+      message: messages.auth.success.register,
     }),
     {
       status: 200,

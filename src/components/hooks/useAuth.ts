@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import type { AuthFormValues } from "@/types";
+import { messages } from "@/lib/messages";
 
 interface UseAuthResult {
   error: string | null;
@@ -30,7 +31,7 @@ const useAuth = (): UseAuthResult => {
       const response = await fetch("/api/auth/session", { credentials: "include" });
 
       if (!response.ok) {
-        throw new Error("Nie udało się pobrać informacji o sesji.");
+        throw new Error(messages.auth.errors.sessionFetchFailed);
       }
 
       const data = (await response.json()) as { user: User | null };
@@ -47,7 +48,7 @@ const useAuth = (): UseAuthResult => {
       }
 
       setUser(null);
-      setError(sessionError instanceof Error ? sessionError.message : "Nie udało się pobrać informacji o sesji.");
+      setError(sessionError instanceof Error ? sessionError.message : messages.auth.errors.sessionFetchFailed);
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -86,7 +87,7 @@ const useAuth = (): UseAuthResult => {
 
         if (!response.ok) {
           const body = (await response.json().catch(() => ({}))) as { error?: string };
-          throw new Error(body.error ?? "Nie udało się zalogować.");
+          throw new Error(body.error ?? messages.auth.errors.loginFailed);
         }
 
         await loadSession();
@@ -98,7 +99,7 @@ const useAuth = (): UseAuthResult => {
         return true;
       } catch (authError) {
         if (isMountedRef.current) {
-          setError(authError instanceof Error ? authError.message : "Nie udało się zalogować.");
+          setError(authError instanceof Error ? authError.message : messages.auth.errors.loginFailed);
           setLoading(false);
         }
 
@@ -122,7 +123,7 @@ const useAuth = (): UseAuthResult => {
 
         if (!response.ok) {
           const body = (await response.json().catch(() => ({}))) as { error?: string };
-          throw new Error(body.error ?? "Nie udało się zarejestrować użytkownika.");
+          throw new Error(body.error ?? messages.auth.errors.registerFailed);
         }
 
         await loadSession();
@@ -134,7 +135,7 @@ const useAuth = (): UseAuthResult => {
         return true;
       } catch (authError) {
         if (isMountedRef.current) {
-          setError(authError instanceof Error ? authError.message : "Nie udało się zarejestrować użytkownika.");
+          setError(authError instanceof Error ? authError.message : messages.auth.errors.registerFailed);
           setLoading(false);
         }
 
@@ -155,7 +156,7 @@ const useAuth = (): UseAuthResult => {
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? "Nie udało się wylogować.");
+        throw new Error(body.error ?? messages.auth.errors.logoutFailed);
       }
 
       if (isMountedRef.current) {
@@ -167,7 +168,7 @@ const useAuth = (): UseAuthResult => {
       return true;
     } catch (signOutError) {
       if (isMountedRef.current) {
-        setError(signOutError instanceof Error ? signOutError.message : "Nie udało się wylogować.");
+        setError(signOutError instanceof Error ? signOutError.message : messages.auth.errors.logoutFailed);
         setLoading(false);
       }
 

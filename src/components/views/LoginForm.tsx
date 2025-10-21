@@ -6,12 +6,13 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { messages } from "@/lib/messages";
 import type { AuthFormValues } from "@/types";
 
 const loginFormSchema = z
   .object({
-    email: z.string().min(1, "Podaj adres e-mail.").email("Podaj poprawny adres e-mail."),
-    password: z.string().min(1, "Podaj hasło."),
+    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
+    password: z.string().min(1, messages.auth.validation.passwordRequired),
   })
   .strict();
 
@@ -54,12 +55,12 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate data-test-id="login-form">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="login-email">Adres e-mail</Label>
+        <Label htmlFor="login-email">{messages.auth.login.emailLabel}</Label>
         <Input
           id="login-email"
           type="email"
           autoComplete="email"
-          placeholder="jan.kowalski@example.com"
+          placeholder={messages.common.placeholders.email}
           {...register("email")}
           aria-invalid={Boolean(errors.email)}
           data-test-id="login-email-input"
@@ -67,7 +68,7 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
         {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="login-password">Hasło</Label>
+        <Label htmlFor="login-password">{messages.auth.login.passwordLabel}</Label>
         <Input
           id="login-password"
           type="password"
@@ -86,12 +87,10 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
       ) : null}
 
       <Button type="submit" disabled={isBusy} className="w-full" data-test-id="login-submit-button">
-        {isBusy ? "Logowanie..." : "Zaloguj się"}
+        {isBusy ? messages.common.loading.loggingIn : messages.auth.login.submit}
       </Button>
 
-      <p className="text-sm text-muted-foreground">
-        Logując się, akceptujesz regulamin i politykę prywatności aplikacji 10x Hymns.
-      </p>
+      <p className="text-sm text-muted-foreground">{messages.auth.login.disclaimer}</p>
     </form>
   );
 };

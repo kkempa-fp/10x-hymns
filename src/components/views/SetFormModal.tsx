@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { messages } from "@/lib/messages";
 import type { SetFormValues } from "@/types";
 
 type SetFormMode = "create" | "edit";
@@ -19,8 +20,10 @@ interface SetFormModalProps {
   onSubmit: (values: SetFormValues) => Promise<boolean>;
 }
 
-const getTitle = (mode: SetFormMode) => (mode === "create" ? "Dodaj nowy zestaw" : "Edytuj zestaw");
-const getSubmitLabel = (mode: SetFormMode) => (mode === "create" ? "Utwórz zestaw" : "Zapisz zmiany");
+const getTitle = (mode: SetFormMode) =>
+  mode === "create" ? messages.sets.form.titleCreate : messages.sets.form.titleEdit;
+const getSubmitLabel = (mode: SetFormMode) =>
+  mode === "create" ? messages.sets.form.submitCreate : messages.sets.form.submitEdit;
 
 const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loading, mode, onClose, onSubmit }) => {
   const [mounted, setMounted] = useState(false);
@@ -85,7 +88,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
       const trimmedContent = values.content.trim();
 
       if (!trimmedName) {
-        setLocalError("Nazwa zestawu jest wymagana.");
+        setLocalError(messages.sets.form.nameRequired);
         return;
       }
 
@@ -98,7 +101,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
 
       const isSuccess = await onSubmit(payload);
       if (!isSuccess && !error) {
-        setLocalError("Nie udało się zapisać zestawu. Spróbuj ponownie.");
+        setLocalError(messages.common.errors.saveSetFailed);
       }
     },
     [error, onSubmit, values.content, values.name]
@@ -123,17 +126,17 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
             {getTitle(mode)}
           </h2>
           <Button type="button" variant="ghost" onClick={onClose} disabled={loading} data-test-id="set-close-button">
-            Zamknij
+            {messages.common.buttons.close}
           </Button>
         </header>
 
         <form className="mt-6 flex flex-col gap-5" onSubmit={handleSubmit} noValidate data-test-id="set-form">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="set-name">Nazwa zestawu</Label>
+            <Label htmlFor="set-name">{messages.sets.form.nameLabel}</Label>
             <Input
               id="set-name"
               name="name"
-              placeholder="np. 29 Niedziela Zwykła (rok C)"
+              placeholder={messages.common.placeholders.setName}
               autoComplete="off"
               value={values.name}
               onChange={handleChange}
@@ -146,7 +149,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="set-content">Opis / zawartość</Label>
+              <Label htmlFor="set-content">{messages.sets.form.contentLabel}</Label>
               <span className="text-xs text-muted-foreground">
                 {contentLength}/{CONTENT_LIMIT}
               </span>
@@ -154,7 +157,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
             <Textarea
               id="set-content"
               name="content"
-              placeholder="np. We: Spojrzyj z nieba wysokiego (1-2)"
+              placeholder={messages.common.placeholders.setContent}
               value={values.content}
               onChange={handleChange}
               disabled={loading}
@@ -162,19 +165,17 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
               maxLength={CONTENT_LIMIT}
               data-test-id="set-content-input"
             />
-            <p className="text-xs text-muted-foreground">
-              Opisz przeznaczenie zestawu lub wypisz pieśni, które powinny się w nim znaleźć.
-            </p>
+            <p className="text-xs text-muted-foreground">{messages.sets.form.contentHelper}</p>
           </div>
 
           {combinedError ? <p className="text-sm text-destructive">{combinedError}</p> : null}
 
           <div className="flex items-center justify-end gap-2">
             <Button type="button" variant="ghost" onClick={onClose} disabled={loading} data-test-id="set-cancel-button">
-              Anuluj
+              {messages.common.buttons.cancel}
             </Button>
             <Button type="submit" disabled={loading} data-test-id="set-submit-button">
-              {loading ? "Zapisywanie..." : getSubmitLabel(mode)}
+              {loading ? messages.common.loading.saving : getSubmitLabel(mode)}
             </Button>
           </div>
         </form>

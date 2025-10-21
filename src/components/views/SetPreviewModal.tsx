@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, type FC } from "react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 import type { SetDto } from "@/types";
 
 interface SetPreviewModalProps {
@@ -90,16 +91,16 @@ const SetPreviewModal: FC<SetPreviewModalProps> = ({ isOpen, onClose, set }) => 
             {set.name}
           </h2>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Zamknij
+            {messages.common.buttons.close}
           </Button>
         </header>
 
         <div className="mt-6 flex flex-col gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-muted-foreground">Opis / zawartość</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">{messages.sets.preview.descriptionHeading}</h3>
             <div className="mt-2 max-h-[60vh] overflow-y-auto rounded-lg border border-border/60 bg-muted/20 p-4">
               <pre className="whitespace-pre-wrap font-mono text-sm text-foreground/80">
-                {content ? content : "Brak opisu"}
+                {content ? content : messages.common.fallback.noDescription}
               </pre>
             </div>
           </div>

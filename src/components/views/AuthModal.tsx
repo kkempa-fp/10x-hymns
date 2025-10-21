@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useState, type FC, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type AuthModalView = "login" | "register";
@@ -59,8 +60,8 @@ const AuthModal: FC<AuthModalProps> = ({ activeView, isOpen, loginForm, onClose,
 
   const currentTab = activeView;
   const headingMap: Record<AuthModalView, string> = {
-    login: "Zaloguj się",
-    register: "Załóż konto",
+    login: messages.auth.modal.loginTitle,
+    register: messages.auth.modal.registerTitle,
   };
 
   const modalContent = (
@@ -73,14 +74,14 @@ const AuthModal: FC<AuthModalProps> = ({ activeView, isOpen, loginForm, onClose,
         <div className="flex items-center justify-between">
           <h2 className="text-[1.375rem] font-semibold leading-tight">{headingMap[currentTab]}</h2>
           <Button type="button" variant="ghost" onClick={onClose}>
-            Zamknij
+            {messages.common.buttons.close}
           </Button>
         </div>
 
         <Tabs value={currentTab} onValueChange={(value) => onViewChange(value as AuthModalView)} className="mt-4">
           <TabsList className="w-full">
-            <TabsTrigger value="login">Logowanie</TabsTrigger>
-            <TabsTrigger value="register">Rejestracja</TabsTrigger>
+            <TabsTrigger value="login">{messages.auth.modal.loginTab}</TabsTrigger>
+            <TabsTrigger value="register">{messages.auth.modal.registerTab}</TabsTrigger>
           </TabsList>
           <TabsContent value="login">{loginForm}</TabsContent>
           <TabsContent value="register">{registerForm}</TabsContent>

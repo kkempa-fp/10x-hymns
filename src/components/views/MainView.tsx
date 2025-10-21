@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { FC } from "react";
 
 import type { AuthFormValues } from "@/types";
+import { messages } from "@/lib/messages";
 import { cn } from "@/lib/utils";
 
 import useAuth from "../hooks/useAuth";
@@ -69,9 +70,7 @@ const MainView: FC = () => {
     async (values: AuthFormValues) => {
       const isSuccess = await signUp(values);
       if (isSuccess) {
-        setAuthInfo(
-          "Na podany adres e-mail wysłaliśmy link aktywacyjny. Kliknij w niego, aby dokończyć rejestrację i zalogować się."
-        );
+        setAuthInfo(messages.auth.info.verificationSent);
         setAuthModalView("login");
       }
 
@@ -94,7 +93,7 @@ const MainView: FC = () => {
 
     if (!user) {
       resetError();
-      setAuthInfo("Adres e-mail został potwierdzony. Zaloguj się, aby rozpocząć korzystanie z aplikacji.");
+      setAuthInfo(messages.auth.info.emailConfirmed);
       setAuthModalView("login");
       setAuthModalOpen(true);
     }
@@ -114,8 +113,8 @@ const MainView: FC = () => {
             <div className="inline-flex w-full max-w-xs items-center justify-start gap-2 rounded-[var(--md-sys-shape-corner-extra-large)] bg-accent/30 p-[var(--md-sys-spacing-4)]">
               {(
                 [
-                  { id: "generator", label: "Generator" },
-                  { id: "sets", label: "Zestawy" },
+                  { id: "generator", label: messages.mainView.tabs.generator },
+                  { id: "sets", label: messages.mainView.tabs.sets },
                 ] as const
               ).map((tab) => (
                 <button

@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 import type { SetDto } from "@/types";
 
 interface DeleteSetDialogProps {
@@ -16,7 +17,7 @@ interface DeleteSetDialogProps {
 const DeleteSetDialog: FC<DeleteSetDialogProps> = ({ error, isOpen, loading, onCancel, onConfirm, targetSet }) => {
   const [mounted, setMounted] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-  const setName = useMemo(() => targetSet?.name ?? "wybrany zestaw", [targetSet]);
+  const setName = useMemo(() => targetSet?.name ?? messages.common.fallback.setName, [targetSet]);
 
   useEffect(() => {
     setMounted(true);
@@ -64,7 +65,7 @@ const DeleteSetDialog: FC<DeleteSetDialogProps> = ({ error, isOpen, loading, onC
   const handleConfirm = useCallback(async () => {
     const isSuccess = await onConfirm();
     if (!isSuccess && !error) {
-      setLocalError("Nie udało się usunąć zestawu. Spróbuj ponownie.");
+      setLocalError(messages.common.errors.deleteSetFailed);
     }
   }, [error, onConfirm]);
 
@@ -83,21 +84,22 @@ const DeleteSetDialog: FC<DeleteSetDialogProps> = ({ error, isOpen, loading, onC
     >
       <div className="w-full max-w-lg rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background/95 p-6 shadow-[var(--md-sys-elevation-level-4)]">
         <h2 id="delete-set-dialog-title" className="text-[1.375rem] font-semibold leading-tight">
-          Usuń zestaw
+          {messages.deleteSetDialog.title}
         </h2>
         <p className="mt-3 text-[0.9375rem] text-muted-foreground">
-          Czy na pewno chcesz usunąć zestaw <span className="font-mono font-semibold text-foreground">{setName}</span>?
-          Tej operacji nie można cofnąć.
+          {messages.deleteSetDialog.prompt.prefix}{" "}
+          <span className="font-mono font-semibold text-foreground">{setName}</span>
+          {messages.deleteSetDialog.prompt.suffix}
         </p>
 
         {combinedError ? <p className="mt-3 text-sm text-destructive">{combinedError}</p> : null}
 
         <div className="mt-6 flex items-center justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onCancel} disabled={loading}>
-            Anuluj
+            {messages.common.buttons.cancel}
           </Button>
           <Button type="button" variant="destructive" onClick={handleConfirm} disabled={loading}>
-            {loading ? "Usuwanie..." : "Usuń"}
+            {loading ? messages.common.loading.deleting : messages.common.buttons.delete}
           </Button>
         </div>
       </div>

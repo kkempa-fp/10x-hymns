@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AsyncState, ListSetsQueryDto, ListSetsResponseDto } from "@/types";
 import { resolveRequestError } from "@/lib/errors";
+import { messages } from "@/lib/messages";
 
 interface UseSetsResult {
   data: ListSetsResponseDto | null;
@@ -46,7 +47,7 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
       });
 
       if (!response.ok) {
-        let message = "Nie udało się pobrać listy zestawów.";
+        let message: string = messages.sets.errors.listFetchFailed;
 
         try {
           const payload = (await response.clone().json()) as { error?: string };
@@ -70,7 +71,7 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
         return;
       }
 
-      const message = resolveRequestError(requestError, "Nie udało się pobrać listy zestawów.");
+      const message = resolveRequestError(requestError, messages.sets.errors.listFetchFailed);
       setState((previous) => ({ data: previous.data, error: message, loading: false }));
     }
   }, []);

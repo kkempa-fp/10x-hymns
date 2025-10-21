@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CreateSetCommand, SetDto, UpdateSetCommand } from "@/types";
 import { resolveRequestError } from "@/lib/errors";
+import { messages } from "@/lib/messages";
 
 interface UseSetMutationResult {
   createSet: (payload: CreateSetCommand) => Promise<SetDto | null>;
@@ -35,10 +36,11 @@ const useSetMutation = (): UseSetMutationResult => {
     if (!response.ok) {
       try {
         const payload = await response.json();
-        const message = typeof payload?.error === "string" ? payload.error : "Nie udało się przetworzyć żądania.";
+        const message =
+          typeof payload?.error === "string" ? payload.error : messages.common.errors.processRequestFailed;
         throw new Error(message);
       } catch {
-        throw new Error("Nie udało się przetworzyć żądania.");
+        throw new Error(messages.common.errors.processRequestFailed);
       }
     }
 
@@ -62,7 +64,7 @@ const useSetMutation = (): UseSetMutationResult => {
     try {
       return (await response.json()) as T;
     } catch {
-      throw new Error("Nie udało się odczytać odpowiedzi serwera.");
+      throw new Error(messages.common.errors.readResponseFailed);
     }
   }, []);
 
@@ -80,7 +82,7 @@ const useSetMutation = (): UseSetMutationResult => {
         return payload;
       } catch (unknownError) {
         if (isMountedRef.current) {
-          const message = resolveRequestError(unknownError, "Wystąpił nieznany błąd.");
+          const message = resolveRequestError(unknownError, messages.common.errors.unknown);
           setError(message);
         }
         return null;

@@ -1,6 +1,7 @@
 import type { FC } from "react";
 
 import { Button } from "@/components/ui/button";
+import { messages } from "@/lib/messages";
 import type { ListSetsQueryDto, SetDto } from "@/types";
 
 interface SetsDataTableProps {
@@ -31,7 +32,7 @@ const formatDate = (isoDate: string) => {
 
 const renderContentPreview = (content: string | null) => {
   if (!content) {
-    return "—";
+    return messages.common.fallback.emptyValue;
   }
 
   return content.length > 100 ? `${content.slice(0, 97)}...` : content;
@@ -58,10 +59,8 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
   if (!loading && sets.length === 0) {
     return (
       <div className="flex flex-col items-start gap-2 rounded-[var(--md-sys-shape-corner-extra-large)] border border-dashed border-border bg-muted/40 p-6 text-muted-foreground">
-        <h3 className="text-base font-semibold text-foreground">Brak zestawów</h3>
-        <p className="text-sm text-muted-foreground">
-          Dodaj pierwszy zestaw, aby przechowywać i organizować propozycje pieśni.
-        </p>
+        <h3 className="text-base font-semibold text-foreground">{messages.sets.table.emptyTitle}</h3>
+        <p className="text-sm text-muted-foreground">{messages.sets.table.emptyDescription}</p>
       </div>
     );
   }
@@ -81,7 +80,8 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                 className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("name")}
               >
-                Nazwa zestawu <span aria-hidden>{sortIndicator(sortField === "name", sortOrder)}</span>
+                {messages.sets.table.columnName}{" "}
+                <span aria-hidden>{sortIndicator(sortField === "name", sortOrder)}</span>
               </button>
             </th>
             <th
@@ -94,7 +94,8 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                 className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("content")}
               >
-                Opis / zawartość <span aria-hidden>{sortIndicator(sortField === "content", sortOrder)}</span>
+                {messages.sets.table.columnContent}{" "}
+                <span aria-hidden>{sortIndicator(sortField === "content", sortOrder)}</span>
               </button>
             </th>
             <th
@@ -107,7 +108,8 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                 className="flex items-center gap-1 text-left text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 onClick={() => onSortChange("updated_at")}
               >
-                Ostatnia aktualizacja <span aria-hidden>{sortIndicator(sortField === "updated_at", sortOrder)}</span>
+                {messages.sets.table.columnUpdatedAt}{" "}
+                <span aria-hidden>{sortIndicator(sortField === "updated_at", sortOrder)}</span>
               </button>
             </th>
             <th
@@ -160,7 +162,7 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                       onEdit(set);
                     }}
                   >
-                    Edytuj
+                    {messages.common.buttons.edit}
                   </Button>
                   <Button
                     type="button"
@@ -171,7 +173,7 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                       onDelete(set);
                     }}
                   >
-                    Usuń
+                    {messages.common.buttons.delete}
                   </Button>
                 </div>
               </td>
