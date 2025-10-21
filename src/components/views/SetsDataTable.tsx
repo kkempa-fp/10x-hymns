@@ -68,7 +68,7 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
 
   return (
     <div className="overflow-hidden rounded-[var(--md-sys-shape-corner-extra-large)] border border-border bg-background shadow-[var(--md-sys-elevation-level-1)]">
-      <table className="min-w-full divide-y divide-border/60">
+      <table className="min-w-full divide-y divide-border/60" data-test-id="sets-table">
         <thead className="bg-muted/40">
           <tr>
             <th
@@ -136,6 +136,7 @@ const SetsDataTable: FC<SetsDataTableProps> = ({
                 }
               }}
               tabIndex={0}
+              data-test-id="sets-table-row"
             >
               <td className="px-4 py-4 align-top">
                 <div className="flex flex-col gap-1">

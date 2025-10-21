@@ -50,12 +50,12 @@ const Header: FC<HeaderProps> = ({ onLoginClick, onLogoutClick, user }) => {
         {user ? (
           <>
             <span className="text-[0.9375rem] text-muted-foreground">{user.email}</span>
-            <Button type="button" variant="outline" onClick={onLogoutClick}>
+            <Button type="button" variant="outline" onClick={onLogoutClick} data-test-id="header-logout-button">
               Wyloguj się
             </Button>
           </>
         ) : (
-          <Button type="button" variant="tonal" onClick={onLoginClick}>
+          <Button type="button" variant="tonal" onClick={onLoginClick} data-test-id="header-login-button">
             Zaloguj się
           </Button>
         )}

@@ -201,7 +201,10 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
   const resolvedAuthState = authLoading ? null : Boolean(user);
 
   return (
-    <section className="surface-raised rounded-[var(--md-sys-shape-corner-extra-large)] border border-border p-6">
+    <section
+      className="surface-raised rounded-[var(--md-sys-shape-corner-extra-large)] border border-border p-6"
+      data-test-id="suggestion-generator"
+    >
       <header className="flex flex-col gap-1">
         <h2 className="text-[1.375rem] font-semibold leading-tight">Generator sugestii pieśni</h2>
         <p className="text-[0.9375rem] text-muted-foreground">
@@ -232,11 +235,12 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             value={text}
             onChange={handleTextChange}
             disabled={loading}
+            data-test-id="suggestion-input"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={isGenerateDisabled}>
+          <Button type="submit" disabled={isGenerateDisabled} data-test-id="suggestion-submit-button">
             {loading ? "Generowanie..." : "Generuj propozycje"}
           </Button>
           <span className="text-[0.9375rem] text-muted-foreground">
@@ -257,6 +261,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             value={suggestionsAsText}
             readOnly
             className="bg-muted/60 font-mono text-[0.9375rem]"
+            data-test-id="suggestion-output"
           />
         </div>
 
@@ -267,6 +272,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             disabled={isRatingDisabled}
             onClick={() => void handleRating("up")}
             aria-pressed={lastRating === "up"}
+            data-test-id="suggestion-rate-up"
           >
             👍 Dobre propozycje
           </Button>
@@ -276,6 +282,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
             disabled={isRatingDisabled}
             onClick={() => void handleRating("down")}
             aria-pressed={lastRating === "down"}
+            data-test-id="suggestion-rate-down"
           >
             👎 Nietrafione sugestie
           </Button>
@@ -286,8 +293,16 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
           ) : null}
         </div>
 
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        {statusMessage && !error ? <p className="text-sm text-primary">{statusMessage}</p> : null}
+        {error ? (
+          <p className="text-sm text-destructive" data-test-id="suggestion-error-message">
+            {error}
+          </p>
+        ) : null}
+        {statusMessage && !error ? (
+          <p className="text-sm text-primary" data-test-id="suggestion-status-message">
+            {statusMessage}
+          </p>
+        ) : null}
       </div>
     </section>
   );

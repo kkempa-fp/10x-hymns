@@ -223,7 +223,7 @@ const SetsManager: FC = () => {
   const showPagination = totalPages > 1 && sets.length > 0;
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6" data-test-id="sets-manager">
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-[1.375rem] font-semibold leading-tight">Zarządzanie zestawami</h2>
@@ -231,7 +231,7 @@ const SetsManager: FC = () => {
             Przechowuj zestawy pieśni, aby łatwo korzystać z nich podczas przygotowania liturgii.
           </p>
         </div>
-        <Button type="button" onClick={openCreateModal}>
+        <Button type="button" onClick={openCreateModal} data-test-id="sets-create-button">
           Dodaj zestaw
         </Button>
       </header>
@@ -253,7 +253,11 @@ const SetsManager: FC = () => {
           <div className="text-[0.9375rem] text-muted-foreground">Łącznie {totalSets} zestawów</div>
         </div>
 
-        {statusMessage ? <p className="text-sm text-primary">{statusMessage}</p> : null}
+        {statusMessage ? (
+          <p className="text-sm text-primary" data-test-id="sets-status-message">
+            {statusMessage}
+          </p>
+        ) : null}
         {listError ? (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
             <p>{listError}</p>

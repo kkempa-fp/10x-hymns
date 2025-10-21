@@ -129,6 +129,7 @@ const MainView: FC = () => {
                   )}
                   onClick={() => setActiveTab(tab.id)}
                   aria-pressed={activeTab === tab.id}
+                  data-test-id={`main-tab-${tab.id}`}
                 >
                   {tab.label}
                 </button>

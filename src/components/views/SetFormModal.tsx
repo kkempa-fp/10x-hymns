@@ -122,12 +122,12 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
           <h2 id="set-form-modal-title" className="text-[1.375rem] font-semibold leading-tight">
             {getTitle(mode)}
           </h2>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={loading} data-test-id="set-close-button">
             Zamknij
           </Button>
         </header>
 
-        <form className="mt-6 flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+        <form className="mt-6 flex flex-col gap-5" onSubmit={handleSubmit} noValidate data-test-id="set-form">
           <div className="flex flex-col gap-2">
             <Label htmlFor="set-name">Nazwa zestawu</Label>
             <Input
@@ -140,6 +140,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
               disabled={loading}
               className="font-mono"
               required
+              data-test-id="set-name-input"
             />
           </div>
 
@@ -159,6 +160,7 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
               disabled={loading}
               className="font-mono"
               maxLength={CONTENT_LIMIT}
+              data-test-id="set-content-input"
             />
             <p className="text-xs text-muted-foreground">
               Opisz przeznaczenie zestawu lub wypisz pieśni, które powinny się w nim znaleźć.
@@ -168,10 +170,10 @@ const SetFormModal: FC<SetFormModalProps> = ({ error, initialValues, isOpen, loa
           {combinedError ? <p className="text-sm text-destructive">{combinedError}</p> : null}
 
           <div className="flex items-center justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading} data-test-id="set-cancel-button">
               Anuluj
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} data-test-id="set-submit-button">
               {loading ? "Zapisywanie..." : getSubmitLabel(mode)}
             </Button>
           </div>

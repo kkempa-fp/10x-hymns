@@ -52,7 +52,7 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
   const rootError = errors.root?.message ?? error;
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitHandler)} noValidate data-test-id="login-form">
       <div className="flex flex-col gap-2">
         <Label htmlFor="login-email">Adres e-mail</Label>
         <Input
@@ -62,6 +62,7 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
           placeholder="jan.kowalski@example.com"
           {...register("email")}
           aria-invalid={Boolean(errors.email)}
+          data-test-id="login-email-input"
         />
         {errors.email ? <p className="text-sm text-destructive">{errors.email.message}</p> : null}
       </div>
@@ -73,6 +74,7 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
           autoComplete="current-password"
           {...register("password")}
           aria-invalid={Boolean(errors.password)}
+          data-test-id="login-password-input"
         />
         {errors.password ? <p className="text-sm text-destructive">{errors.password.message}</p> : null}
       </div>
@@ -83,7 +85,7 @@ const LoginForm: FC<LoginFormProps> = ({ error, info, loading, onSubmit }) => {
         </div>
       ) : null}
 
-      <Button type="submit" disabled={isBusy} className="w-full">
+      <Button type="submit" disabled={isBusy} className="w-full" data-test-id="login-submit-button">
         {isBusy ? "Logowanie..." : "Zaloguj się"}
       </Button>
 
