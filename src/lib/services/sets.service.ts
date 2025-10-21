@@ -21,10 +21,20 @@ const SET_SELECT_COLUMNS_WITH_OWNER = "id,name,content,created_at,updated_at,use
 type SetRow = Pick<Set, "id" | "name" | "content" | "created_at" | "updated_at">;
 type SetRowWithOwner = SetRow & { user_id: string };
 
+/**
+ * Custom error class for the SetService.
+ * Extends the native Error class to include an HTTP status code for API responses.
+ */
 export class SetServiceError extends Error {
   readonly status: number;
   override readonly cause?: unknown;
 
+  /**
+   * Creates an instance of SetServiceError.
+   * @param message - The error message.
+   * @param status - The HTTP status code associated with the error. Defaults to 500.
+   * @param options - Optional parameters, including the original error cause.
+   */
   constructor(message: string, status = 500, options?: { cause?: unknown }) {
     super(message);
     this.name = "SetServiceError";
@@ -33,6 +43,11 @@ export class SetServiceError extends Error {
   }
 }
 
+/**
+ * Maps a database row to a SetDto.
+ * @param row - The set data row from the database.
+ * @returns A `SetDto` object.
+ */
 const mapToSetDto = (row: SetRow): SetDto => ({
   id: row.id,
   name: row.name,
@@ -41,11 +56,30 @@ const mapToSetDto = (row: SetRow): SetDto => ({
   updated_at: row.updated_at,
 });
 
+/**
+ * Checks if a PostgrestError is a unique constraint violation.
+ * @param error - The PostgrestError object from Supabase.
+ * @returns `true` if the error is a unique constraint violation (code 23505), otherwise `false`.
+ */
 const isUniqueConstraintViolation = (error: PostgrestError | null) => error?.code === "23505";
 
+/**
+ * A factory function that creates an instance of the SetsService.
+ * The service handles all CRUD operations for hymn sets, ensuring user ownership and data integrity.
+ *
+ * @param supabase - An instance of the SupabaseClient.
+ * @returns An object containing methods for managing sets.
+ */
 export const createSetsService = (supabase: SupabaseClient) => {
   type NormalizedListQuery = { search?: string } & Required<Omit<ListSetsQueryDto, "search">>;
 
+  /**
+   * Fetches a set record including the owner's user ID.
+   * @private
+   * @param setId - The ID of the set to fetch.
+   * @returns A promise that resolves to the set row with owner ID, or null if not found.
+   * @throws {SetServiceError} If the database query fails.
+   */
   const fetchSetWithOwner = async (setId: string): Promise<SetRowWithOwner | null> => {
     const { data, error } = await supabase
       .from("sets")
@@ -73,6 +107,14 @@ export const createSetsService = (supabase: SupabaseClient) => {
     return { ...setRow, user_id: typed.user_id } satisfies SetRowWithOwner;
   };
 
+  /**
+   * Asserts that a user is the owner of a specific set.
+   * @private
+   * @param userId - The ID of the user.
+   * @param setId - The ID of the set.
+   * @returns A promise that resolves to the set row if ownership is confirmed.
+   * @throws {SetServiceError} If the user is not authenticated (400), the set is not found (404), or the user is not the owner (403).
+   */
   const assertOwnership = async (userId: string, setId: string): Promise<SetRowWithOwner> => {
     if (!userId) {
       throw new SetServiceError("User context is required", 400);
@@ -91,6 +133,12 @@ export const createSetsService = (supabase: SupabaseClient) => {
     return record;
   };
 
+  /**
+   * Applies default values to the list query parameters.
+   * @private
+   * @param query - The raw query parameters from the request.
+   * @returns A normalized query object with defaults applied.
+   */
   const applyQueryDefaults = (query: ListSetsQueryDto = {}): NormalizedListQuery => {
     const page = query.page && query.page > 0 ? query.page : 1;
     const limit = query.limit && query.limit > 0 ? query.limit : 10;
@@ -106,6 +154,13 @@ export const createSetsService = (supabase: SupabaseClient) => {
     } satisfies NormalizedListQuery;
   };
 
+  /**
+   * Creates a new set for a given user.
+   * @param userId - The ID of the user creating the set.
+   * @param command - The data for the new set.
+   * @returns A promise that resolves to a `CreateSetResponseDto` containing the created set.
+   * @throws {SetServiceError} If the user is not authenticated (400), a set with the same name exists (409), or the database operation fails (500).
+   */
   const create = async (userId: string, command: CreateSetCommand): Promise<CreateSetResponseDto> => {
     if (!userId) {
       throw new SetServiceError("User context is required", 400);
@@ -133,6 +188,13 @@ export const createSetsService = (supabase: SupabaseClient) => {
     return { data: dto };
   };
 
+  /**
+   * Lists all sets belonging to a user, with support for pagination, sorting, and searching.
+   * @param userId - The ID of the user whose sets are to be listed.
+   * @param query - Optional query parameters for pagination, sorting, and searching.
+   * @returns A promise that resolves to a `ListSetsResponseDto` containing the list of sets and pagination metadata.
+   * @throws {SetServiceError} If the user is not authenticated (400) or the database query fails (500).
+   */
   const list = async (userId: string, query?: ListSetsQueryDto): Promise<ListSetsResponseDto> => {
     if (!userId) {
       throw new SetServiceError("User context is required", 400);
@@ -176,12 +238,27 @@ export const createSetsService = (supabase: SupabaseClient) => {
     } satisfies ListSetsResponseDto;
   };
 
+  /**
+   * Retrieves a single set by its ID, ensuring user ownership.
+   * @param userId - The ID of the user requesting the set.
+   * @param setId - The ID of the set to retrieve.
+   * @returns A promise that resolves to a `GetSetResponseDto` containing the set data.
+   * @throws {SetServiceError} If ownership cannot be verified (403, 404).
+   */
   const getById = async (userId: string, setId: string): Promise<GetSetResponseDto> => {
     const record = await assertOwnership(userId, setId);
 
     return { data: mapToSetDto(record) } satisfies GetSetResponseDto;
   };
 
+  /**
+   * Updates an existing set, ensuring user ownership.
+   * @param userId - The ID of the user updating the set.
+   * @param setId - The ID of the set to update.
+   * @param command - The new data for the set.
+   * @returns A promise that resolves to an `UpdateSetResponseDto` containing the updated set data.
+   * @throws {SetServiceError} If ownership cannot be verified (403, 404), a name conflict occurs (409), or the database operation fails (500).
+   */
   const update = async (userId: string, setId: string, command: UpdateSetCommand): Promise<UpdateSetResponseDto> => {
     await assertOwnership(userId, setId);
 
@@ -207,6 +284,13 @@ export const createSetsService = (supabase: SupabaseClient) => {
     return { data: mapToSetDto(data) } satisfies UpdateSetResponseDto;
   };
 
+  /**
+   * Deletes a set, ensuring user ownership.
+   * @param userId - The ID of the user deleting the set.
+   * @param setId - The ID of the set to delete.
+   * @returns A promise that resolves to `null` on successful deletion.
+   * @throws {SetServiceError} If ownership cannot be verified (403, 404) or the database operation fails (500).
+   */
   const remove = async (userId: string, setId: string): Promise<DeleteSetResponseDto> => {
     await assertOwnership(userId, setId);
 
