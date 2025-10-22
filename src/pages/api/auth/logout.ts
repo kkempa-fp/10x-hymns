@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
-import { messages } from "@/lib/messages";
 
 export const prerender = false;
 
@@ -10,7 +9,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return new Response(JSON.stringify({ error: messages.auth.errors.logoutFailed }), {
+    return new Response(JSON.stringify({ error: "Failed to sign out." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });

@@ -4,9 +4,10 @@ import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { messages } from "@/components/messages";
+import { translateCommonError, translateSuggestionError } from "@/components/messages/translate";
 import { getSupabaseBrowserClient } from "@/db/supabase.client";
 import { resolveRequestError } from "@/lib/errors";
-import { messages } from "@/lib/messages";
 import type {
   GenerateSuggestionsCommand,
   GenerateSuggestionsResponseDto,
@@ -119,7 +120,8 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
           const message = await response.text();
           if (message) errorMessage = message;
         }
-        throw new Error(errorMessage);
+        const translated = translateSuggestionError(errorMessage, messages.common.errors.fetchSuggestionsFailed);
+        throw new Error(translated);
       }
 
       const data = (await response.json()) as GenerateSuggestionsResponseDto;
@@ -129,8 +131,13 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
       );
       setError(null);
     } catch (requestError) {
-      const message = resolveRequestError(requestError, messages.common.errors.unknown);
-      setError(message);
+      const rawMessage = resolveRequestError(
+        requestError,
+        messages.common.errors.unknown,
+        messages.common.errors.network
+      );
+      const translated = translateSuggestionError(rawMessage, messages.common.errors.unknown);
+      setError(translated);
       setSuggestions([]);
     } finally {
       setLoading(false);
@@ -179,7 +186,11 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
 
         if (!response.ok) {
           const message = await response.text();
-          throw new Error(message || messages.common.errors.submitRatingFailed);
+          const translated = translateCommonError(
+            message || messages.common.errors.submitRatingFailed,
+            messages.common.errors.submitRatingFailed
+          );
+          throw new Error(translated);
         }
 
         setStatusMessage(
@@ -187,8 +198,13 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
         );
         setLastRating(rating);
       } catch (requestError) {
-        const message = resolveRequestError(requestError, messages.common.errors.unknown);
-        setError(message);
+        const rawMessage = resolveRequestError(
+          requestError,
+          messages.common.errors.submitRatingFailed,
+          messages.common.errors.network
+        );
+        const translated = translateCommonError(rawMessage, messages.common.errors.submitRatingFailed);
+        setError(translated);
       } finally {
         setRatingLoading(false);
       }

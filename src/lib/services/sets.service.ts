@@ -142,8 +142,8 @@ export const createSetsService = (supabase: SupabaseClient) => {
   const applyQueryDefaults = (query: ListSetsQueryDto = {}): NormalizedListQuery => {
     const page = query.page && query.page > 0 ? query.page : 1;
     const limit = query.limit && query.limit > 0 ? query.limit : 10;
-    const sortField: Required<ListSetsQueryDto>["sort"] = query.sort ?? "updated_at";
-    const order: Required<ListSetsQueryDto>["order"] = query.order ?? "desc";
+    const sortField: Required<ListSetsQueryDto>["sort"] = query.sort ?? "name";
+    const order: Required<ListSetsQueryDto>["order"] = query.order ?? "asc";
 
     return {
       search: query.search?.trim() || undefined,

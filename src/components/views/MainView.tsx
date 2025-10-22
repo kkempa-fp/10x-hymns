@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { FC } from "react";
 
 import type { AuthFormValues } from "@/types";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 import { cn } from "@/lib/utils";
 
 import useAuth from "../hooks/useAuth";

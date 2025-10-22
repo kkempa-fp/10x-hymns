@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AsyncState, ListSetsQueryDto, ListSetsResponseDto } from "@/types";
+import { messages } from "@/components/messages";
+import { translateSetsError } from "@/components/messages/translate";
 import { resolveRequestError } from "@/lib/errors";
-import { messages } from "@/lib/messages";
+import type { AsyncState, ListSetsQueryDto, ListSetsResponseDto } from "@/types";
 
 interface UseSetsResult {
   data: ListSetsResponseDto | null;
@@ -61,7 +62,8 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
           }
         }
 
-        throw new Error(message);
+        const translated = translateSetsError(message, messages.sets.errors.listFetchFailed);
+        throw new Error(translated);
       }
 
       const payload = (await response.json()) as ListSetsResponseDto;
@@ -71,8 +73,13 @@ const useSets = (initialQuery: ListSetsQueryDto = {}): UseSetsResult => {
         return;
       }
 
-      const message = resolveRequestError(requestError, messages.sets.errors.listFetchFailed);
-      setState((previous) => ({ data: previous.data, error: message, loading: false }));
+      const rawMessage = resolveRequestError(
+        requestError,
+        messages.sets.errors.listFetchFailed,
+        messages.common.errors.network
+      );
+      const translated = translateSetsError(rawMessage, messages.sets.errors.listFetchFailed);
+      setState((previous) => ({ data: previous.data, error: translated, loading: false }));
     }
   }, []);
 

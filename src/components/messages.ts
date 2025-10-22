@@ -58,7 +58,7 @@ export const messages = {
       emailLabel: "Adres e-mail",
       passwordLabel: "Hasło",
       submit: "Zaloguj się",
-      disclaimer: "Logując się, akceptujesz regulamin i politykę prywatności aplikacji 10x Hymns.",
+      disclaimer: "Po zalogowaniu uzyskasz dostęp do pełnej wersji z embeddingami.",
     },
     register: {
       emailLabel: "Adres e-mail",
@@ -178,12 +178,15 @@ export const messages = {
       contentLabel: "Opis / zawartość",
       contentHelper: "Opisz przeznaczenie zestawu lub wypisz pieśni, które powinny się w nim znaleźć.",
       nameRequired: "Nazwa zestawu jest wymagana.",
+      nameDuplicate: "Zestaw o tej nazwie już istnieje.",
     },
     preview: {
       descriptionHeading: "Opis / zawartość",
     },
     errors: {
       listFetchFailed: "Nie udało się pobrać listy zestawów.",
+      notFound: "Nie znaleziono zestawu.",
+      unauthorized: "Musisz być zalogowany, aby zarządzać zestawami.",
     },
   },
   deleteSetDialog: {

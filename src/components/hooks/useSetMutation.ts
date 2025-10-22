@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CreateSetCommand, SetDto, UpdateSetCommand } from "@/types";
+import { messages } from "@/components/messages";
+import { translateSetsError } from "@/components/messages/translate";
 import { resolveRequestError } from "@/lib/errors";
-import { messages } from "@/lib/messages";
+import type { CreateSetCommand, SetDto, UpdateSetCommand } from "@/types";
 
 interface UseSetMutationResult {
   createSet: (payload: CreateSetCommand) => Promise<SetDto | null>;
@@ -32,15 +33,16 @@ const useSetMutation = (): UseSetMutationResult => {
     setError(null);
   }, []);
 
-  const handleResponse = useCallback(async <T>(response: Response): Promise<T> => {
+  const handleResponse = useCallback(async <T>(response: Response, fallback: string): Promise<T> => {
     if (!response.ok) {
       try {
         const payload = await response.json();
-        const message =
+        const rawMessage =
           typeof payload?.error === "string" ? payload.error : messages.common.errors.processRequestFailed;
-        throw new Error(message);
+        const translated = translateSetsError(rawMessage, fallback);
+        throw new Error(translated);
       } catch {
-        throw new Error(messages.common.errors.processRequestFailed);
+        throw new Error(fallback);
       }
     }
 
@@ -69,21 +71,26 @@ const useSetMutation = (): UseSetMutationResult => {
   }, []);
 
   const runMutation = useCallback(
-    async <T>(request: () => Promise<Response>, onSuccess?: (result: T) => void): Promise<T | null> => {
+    async <T>(
+      request: () => Promise<Response>,
+      fallback: string,
+      onSuccess?: (result: T) => void
+    ): Promise<T | null> => {
       setLoading(true);
       setError(null);
 
       try {
         const response = await request();
-        const payload = await handleResponse<T>(response);
+        const payload = await handleResponse<T>(response, fallback);
         if (isMountedRef.current) {
           onSuccess?.(payload);
         }
         return payload;
       } catch (unknownError) {
         if (isMountedRef.current) {
-          const message = resolveRequestError(unknownError, messages.common.errors.unknown);
-          setError(message);
+          const rawMessage = resolveRequestError(unknownError, fallback, messages.common.errors.network);
+          const translated = translateSetsError(rawMessage, fallback);
+          setError(translated);
         }
         return null;
       } finally {
@@ -97,12 +104,14 @@ const useSetMutation = (): UseSetMutationResult => {
 
   const createSet: UseSetMutationResult["createSet"] = useCallback(
     async (payload) => {
-      const result = await runMutation<{ data: SetDto }>(() =>
-        fetch("/api/sets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
+      const result = await runMutation<{ data: SetDto }>(
+        () =>
+          fetch("/api/sets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }),
+        messages.common.errors.saveSetFailed
       );
 
       return result?.data ?? null;
@@ -112,12 +121,14 @@ const useSetMutation = (): UseSetMutationResult => {
 
   const updateSet: UseSetMutationResult["updateSet"] = useCallback(
     async (id, payload) => {
-      const result = await runMutation<{ data: SetDto }>(() =>
-        fetch(`/api/sets/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        })
+      const result = await runMutation<{ data: SetDto }>(
+        () =>
+          fetch(`/api/sets/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }),
+        messages.common.errors.saveSetFailed
       );
 
       return result?.data ?? null;
@@ -127,10 +138,12 @@ const useSetMutation = (): UseSetMutationResult => {
 
   const deleteSet: UseSetMutationResult["deleteSet"] = useCallback(
     async (id) => {
-      const result = await runMutation<null>(() =>
-        fetch(`/api/sets/${id}`, {
-          method: "DELETE",
-        })
+      const result = await runMutation<null>(
+        () =>
+          fetch(`/api/sets/${id}`, {
+            method: "DELETE",
+          }),
+        messages.common.errors.deleteSetFailed
       );
 
       return result !== null;

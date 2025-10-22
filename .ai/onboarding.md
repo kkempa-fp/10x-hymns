@@ -1,4 +1,4 @@
-# Project Onboarding: 10x Hymns
+# Project Onboarding - 10x Hymns
 
 ## Welcome
 

@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 
 import { Button } from "@/components/ui/button";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 import type { SetDto } from "@/types";
 
 interface DeleteSetDialogProps {

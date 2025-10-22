@@ -68,12 +68,17 @@
 ## Available Scripts
 
 - **`npm run dev`** — Starts the Astro development server.
+- **`npm run dev:e2e`** — Starts the dev server in the Playwright test mode.
 - **`npm run build`** — Builds the project for production.
 - **`npm run preview`** — Serves the production build locally.
 - **`npm run astro`** — Runs Astro CLI commands.
 - **`npm run lint`** — Runs ESLint to check for linting issues.
 - **`npm run lint:fix`** — Automatically fixes linting issues.
 - **`npm run format`** — Formats the codebase with Prettier.
+- **`npm run test:unit`** — Runs the Vitest unit test suite once.
+- **`npm run test:unit:ui`** — Opens the Vitest UI for interactive unit testing.
+- **`npm run test:e2e`** — Executes the Playwright end-to-end tests.
+- **`npm run test:e2e:ui`** — Launches the Playwright UI runner.
 
 ## Project Scope
 

@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useState, type FC, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type AuthModalView = "login" | "register";

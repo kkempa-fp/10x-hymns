@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 
+import { messages } from "@/components/messages";
+import { translateAuthError } from "@/components/messages/translate";
 import type { AuthFormValues } from "@/types";
-import { messages } from "@/lib/messages";
 
 interface UseAuthResult {
   error: string | null;
@@ -48,7 +49,12 @@ const useAuth = (): UseAuthResult => {
       }
 
       setUser(null);
-      setError(sessionError instanceof Error ? sessionError.message : messages.auth.errors.sessionFetchFailed);
+      setError(
+        translateAuthError(
+          sessionError instanceof Error ? sessionError.message : null,
+          messages.auth.errors.sessionFetchFailed
+        )
+      );
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -87,7 +93,8 @@ const useAuth = (): UseAuthResult => {
 
         if (!response.ok) {
           const body = (await response.json().catch(() => ({}))) as { error?: string };
-          throw new Error(body.error ?? messages.auth.errors.loginFailed);
+          const errorMessage = translateAuthError(body.error, messages.auth.errors.loginFailed);
+          throw new Error(errorMessage);
         }
 
         await loadSession();
@@ -99,7 +106,11 @@ const useAuth = (): UseAuthResult => {
         return true;
       } catch (authError) {
         if (isMountedRef.current) {
-          setError(authError instanceof Error ? authError.message : messages.auth.errors.loginFailed);
+          const translated = translateAuthError(
+            authError instanceof Error ? authError.message : null,
+            messages.auth.errors.loginFailed
+          );
+          setError(translated);
           setLoading(false);
         }
 
@@ -123,7 +134,8 @@ const useAuth = (): UseAuthResult => {
 
         if (!response.ok) {
           const body = (await response.json().catch(() => ({}))) as { error?: string };
-          throw new Error(body.error ?? messages.auth.errors.registerFailed);
+          const errorMessage = translateAuthError(body.error, messages.auth.errors.registerFailed);
+          throw new Error(errorMessage);
         }
 
         await loadSession();
@@ -135,7 +147,11 @@ const useAuth = (): UseAuthResult => {
         return true;
       } catch (authError) {
         if (isMountedRef.current) {
-          setError(authError instanceof Error ? authError.message : messages.auth.errors.registerFailed);
+          const translated = translateAuthError(
+            authError instanceof Error ? authError.message : null,
+            messages.auth.errors.registerFailed
+          );
+          setError(translated);
           setLoading(false);
         }
 
@@ -156,7 +172,8 @@ const useAuth = (): UseAuthResult => {
 
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? messages.auth.errors.logoutFailed);
+        const errorMessage = translateAuthError(body.error, messages.auth.errors.logoutFailed);
+        throw new Error(errorMessage);
       }
 
       if (isMountedRef.current) {
@@ -168,7 +185,11 @@ const useAuth = (): UseAuthResult => {
       return true;
     } catch (signOutError) {
       if (isMountedRef.current) {
-        setError(signOutError instanceof Error ? signOutError.message : messages.auth.errors.logoutFailed);
+        const translated = translateAuthError(
+          signOutError instanceof Error ? signOutError.message : null,
+          messages.auth.errors.logoutFailed
+        );
+        setError(translated);
         setLoading(false);
       }
 

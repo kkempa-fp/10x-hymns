@@ -2,25 +2,24 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
-import { messages } from "@/lib/messages";
 
 const passwordSchema = z
   .string()
-  .min(8, messages.auth.validation.passwordMin)
-  .regex(/[A-Z]/, messages.auth.validation.passwordUppercase)
-  .regex(/[0-9]/, messages.auth.validation.passwordDigit);
+  .min(8, "Password must be at least 8 characters long.")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
+  .regex(/[0-9]/, "Password must contain at least one digit.");
 
 const registerSchema = z
   .object({
-    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
+    email: z.string().min(1, "Email is required.").email("Email must be a valid email address."),
     password: passwordSchema,
-    confirmPassword: z.string().min(1, messages.auth.validation.confirmPasswordRequired),
+    confirmPassword: z.string().min(1, "Confirm password is required."),
   })
   .superRefine((data, ctx) => {
     if (data.password !== data.confirmPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: messages.auth.validation.passwordsMismatch,
+        message: "Passwords must match.",
         path: ["confirmPassword"],
       });
     }
@@ -33,7 +32,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const parsed = registerSchema.safeParse(payload);
   if (!parsed.success) {
-    const message = parsed.error.issues.at(0)?.message ?? messages.auth.errors.invalidRegisterPayload;
+    const message = parsed.error.issues.at(0)?.message ?? "Invalid registration payload.";
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -46,14 +45,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error?.message && error.message.includes("User already registered")) {
-    return new Response(JSON.stringify({ error: messages.auth.errors.userAlreadyExists }), {
+    return new Response(JSON.stringify({ error: "A user with this email already exists." }), {
       status: 409,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   if (error) {
-    return new Response(JSON.stringify({ error: messages.auth.errors.registerFailed }), {
+    return new Response(JSON.stringify({ error: "Failed to register user." }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
@@ -62,7 +61,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   return new Response(
     JSON.stringify({
       user: data.user,
-      message: messages.auth.success.register,
+      message: "Account created.",
     }),
     {
       status: 200,

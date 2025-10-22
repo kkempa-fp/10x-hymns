@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
   }
 
   if (!userId) {
-    return jsonResponse({ error: "Musisz być zalogowany, aby wyświetlać zestawy." }, 401);
+    return jsonResponse({ error: "You must be signed in to view sets." }, 401);
   }
 
   try {
@@ -70,7 +70,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
   }
 
   if (!userId) {
-    return jsonResponse({ error: "Musisz być zalogowany, aby aktualizować zestawy." }, 401);
+    return jsonResponse({ error: "You must be signed in to update sets." }, 401);
   }
 
   let command: UpdateSetCommand;
@@ -116,7 +116,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   }
 
   if (!userId) {
-    return jsonResponse({ error: "Musisz być zalogowany, aby usuwać zestawy." }, 401);
+    return jsonResponse({ error: "You must be signed in to delete sets." }, 401);
   }
 
   try {

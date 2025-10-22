@@ -33,8 +33,8 @@ const listSetsSchema = z.object({
     .positive("Limit must be positive")
     .max(50, "Limit cannot exceed 50")
     .default(10),
-  sort: z.enum(["name", "created_at", "updated_at", "content"]).default("updated_at"),
-  order: z.enum(["asc", "desc"]).default("desc"),
+  sort: z.enum(["name", "created_at", "updated_at", "content"]).default("name"),
+  order: z.enum(["asc", "desc"]).default("asc"),
 });
 
 const jsonResponse = (body: unknown, status: number) =>
@@ -54,7 +54,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 
   if (!userId) {
-    return jsonResponse({ error: "Musisz być zalogowany, aby wyświetlać zestawy." }, 401);
+    return jsonResponse({ error: "You must be signed in to view sets." }, 401);
   }
 
   let queryParams: z.infer<typeof listSetsSchema>;
@@ -113,7 +113,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   if (!userId) {
-    return jsonResponse({ error: "Musisz być zalogowany, aby tworzyć zestawy." }, 401);
+    return jsonResponse({ error: "You must be signed in to create sets." }, 401);
   }
 
   try {

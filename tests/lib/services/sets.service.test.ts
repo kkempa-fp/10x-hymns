@@ -116,7 +116,7 @@ describe("createSetsService", () => {
 
     expect(select).toHaveBeenCalledWith("id,name,content,created_at,updated_at", { count: "exact" });
     expect(eq).toHaveBeenCalledWith("user_id", "user-1");
-    expect(order).toHaveBeenCalledWith("updated_at", { ascending: false });
+    expect(order).toHaveBeenCalledWith("name", { ascending: true });
     expect(range).toHaveBeenCalledWith(0, 9);
     expect(result).toEqual({
       data: [baseSetRow],

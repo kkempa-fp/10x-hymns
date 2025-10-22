@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MoonStar, SunMedium } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 
 type ResolvedTheme = Extract<ThemeMode, "light" | "dark">;
 

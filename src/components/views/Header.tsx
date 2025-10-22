@@ -2,7 +2,7 @@ import type { FC } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { Button } from "@/components/ui/button";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 import ThemeToggle from "@/components/ui/theme-toggle";
 
 interface HeaderProps {

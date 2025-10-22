@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
 import { Button } from "@/components/ui/button";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 
 interface PaginationProps {
   isDisabled?: boolean;

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState, type ChangeEvent, type FC } from "react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { messages } from "@/lib/messages";
+import { messages } from "@/components/messages";
 import useSetMutation from "../hooks/useSetMutation";
 import useSets from "../hooks/useSets";
 
@@ -18,8 +18,8 @@ import type { ListSetsQueryDto, SetDto, SetFormValues } from "@/types";
 const DEFAULT_QUERY: ListSetsQueryDto = {
   page: 1,
   limit: 10,
-  sort: "updated_at",
-  order: "desc",
+  sort: "name",
+  order: "asc",
 };
 
 interface FormState {
@@ -59,8 +59,8 @@ const SetsManager: FC = () => {
   const currentPage = meta?.page ?? query.page ?? 1;
   const totalPages = meta?.totalPages ?? 1;
   const totalSets = meta?.total ?? 0;
-  const currentSortField = query.sort ?? "updated_at";
-  const currentSortOrder = query.order ?? "desc";
+  const currentSortField = query.sort ?? "name";
+  const currentSortOrder = query.order ?? "asc";
 
   const formInitialValues: SetFormValues = useMemo(() => {
     if (formState.mode === "edit" && formState.target) {

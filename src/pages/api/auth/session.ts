@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
-import { messages } from "@/lib/messages";
 
 const isUnauthorizedError = (error?: { status?: number; message?: string } | null) => {
   if (!error) {
@@ -32,14 +31,14 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   const user = userUnauthorized ? null : (userResponse.data.user ?? null);
 
   if (sessionResponse.error && !sessionUnauthorized) {
-    return new Response(JSON.stringify({ error: messages.auth.errors.sessionApiFailed }), {
+    return new Response(JSON.stringify({ error: "Unable to fetch session." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   if (userResponse.error && !userUnauthorized) {
-    return new Response(JSON.stringify({ error: messages.auth.errors.userFetchFailed }), {
+    return new Response(JSON.stringify({ error: "Unable to fetch user." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

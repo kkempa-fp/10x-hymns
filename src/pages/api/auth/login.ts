@@ -2,35 +2,34 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/db/supabase.client";
-import { messages } from "@/lib/messages";
 
 const loginSchema = z
   .object({
-    email: z.string().min(1, messages.auth.validation.emailRequired).email(messages.auth.validation.emailInvalid),
-    password: z.string().min(1, messages.auth.validation.passwordRequired),
+    email: z.string().min(1, "Email is required.").email("Email must be a valid email address."),
+    password: z.string().min(1, "Password is required."),
   })
   .strict();
 
 const resolveAuthErrorMessage = (message: string | null | undefined) => {
   if (!message) {
-    return messages.auth.errors.loginFailed;
+    return "Failed to sign in.";
   }
 
   const normalized = message.toLowerCase();
 
   if (normalized.includes("invalid login credentials")) {
-    return messages.auth.errors.invalidCredentials;
+    return "Invalid email or password.";
   }
 
   if (normalized.includes("email not confirmed")) {
-    return messages.auth.errors.emailNotConfirmed;
+    return "Please confirm your email before signing in.";
   }
 
   if (normalized.includes("over email otp rate limit")) {
-    return messages.auth.errors.tooManyLoginAttempts;
+    return "Too many login attempts. Try again later.";
   }
 
-  return messages.auth.errors.loginFailed;
+  return "Failed to sign in.";
 };
 
 export const prerender = false;
@@ -40,7 +39,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const parsed = loginSchema.safeParse(payload);
   if (!parsed.success) {
-    const message = parsed.error.issues.at(0)?.message ?? messages.auth.errors.invalidPayload;
+    const message = parsed.error.issues.at(0)?.message ?? "Invalid login payload.";
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
@@ -63,7 +62,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   return new Response(
     JSON.stringify({
       user: data.user,
-      message: messages.auth.success.login,
+      message: "Signed in successfully.",
     }),
     {
       status: 200,
