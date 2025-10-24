@@ -1,5 +1,10 @@
 name: Pull Request
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   pull_request:
     types:
@@ -45,15 +50,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Vitest with coverage
-        run: npx vitest run --coverage.enabled true --coverage.reportsDirectory=coverage/unit --coverage.reporter=text --coverage.reporter=lcov
-
-      - name: Upload unit coverage artifact
-        if: ${{ success() && hashFiles('coverage/unit/**/*') != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-coverage
-          path: coverage/unit
+      - name: Run Vitest
+        run: npx vitest run
 
   e2e_tests:
     name: E2E Tests
@@ -76,33 +74,17 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Export e2e environment variables
+      - name: Run Playwright
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
         run: |
-          {
-            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}";
-            echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}";
-            echo "E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}";
-            echo "E2E_USERNAME=${{ secrets.E2E_USERNAME }}";
-            echo "E2E_PASSWORD=${{ secrets.E2E_PASSWORD }}";
-          } >> "$GITHUB_ENV"
-
-      - name: Run Playwright tests with coverage
-        run: npx playwright test --config=playwright.config.ts --reporter=line --coverage
-
-      - name: Prepare coverage artifact
-        if: ${{ success() }}
-        run: |
-          if [ -d "playwright-report/coverage" ]; then
-            mkdir -p coverage
-            cp -R playwright-report/coverage coverage/e2e
-          fi
-
-      - name: Upload e2e coverage artifact
-        if: ${{ success() && hashFiles('coverage/e2e/**/*') != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-coverage
-          path: coverage/e2e
+          export PUBLIC_SUPABASE_URL="$SUPABASE_URL"
+          export PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_KEY"
+          npx playwright test --config=playwright.config.ts --reporter=line
 
   status_comment:
     name: Status Comment
@@ -111,7 +93,7 @@ jobs:
       - unit_tests
       - e2e_tests
     runs-on: ubuntu-latest
-    if: ${{ needs.lint.result == 'success' && needs.unit_tests.result == 'success' && needs.e2e_tests.result == 'success' }}
+    if: ${{ needs.lint.result == 'success' && needs.unit_tests.result == 'success' && needs.e2e_tests.result == 'success' && github.event.pull_request.head.repo.owner.login == github.repository_owner }}
     steps:
       - name: Publish status comment
         uses: actions/github-script@v8
