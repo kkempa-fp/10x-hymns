@@ -37,18 +37,75 @@ export const test = base.extend<Fixtures>({
     await use(suggestionPage);
   },
   trackSet: async ({ supabase, env }, use) => {
-    const trackedNames: string[] = [];
-    await use((name: string) => {
-      if (!trackedNames.includes(name)) {
-        trackedNames.push(name);
+    const trackedNames = new Set<string>();
+    let cachedUserId: string | null = null;
+
+    const resolveTestUserId = async (): Promise<string> => {
+      if (cachedUserId) {
+        return cachedUserId;
       }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: env.E2E_USERNAME,
+        password: env.E2E_PASSWORD,
+      });
+
+      if (error) {
+        throw new Error(`Unable to authenticate cleanup user: ${error.message}`);
+      }
+
+      const resolvedId = data.user?.id ?? data.session?.user.id ?? null;
+
+      if (!resolvedId) {
+        throw new Error("Cleanup authentication succeeded, but no user id was returned.");
+      }
+
+      cachedUserId = resolvedId;
+      return resolvedId;
+    };
+
+    await use((name: string) => {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        return;
+      }
+
+      trackedNames.add(trimmedName);
     });
 
-    for (const name of trackedNames) {
-      const { error } = await supabase.from("sets").delete().eq("user_id", env.E2E_USERNAME_ID).eq("name", name);
-      if (error) {
-        throw new Error(`Failed to clean up test set "${name}": ${error.message}`);
-      }
+    if (trackedNames.size === 0) {
+      return;
+    }
+
+    const userId = await resolveTestUserId();
+    const names = Array.from(trackedNames);
+    const { error, data } = await supabase
+      .from("sets")
+      .delete()
+      .eq("user_id", userId)
+      .in("name", names)
+      .select("id, name");
+
+    if (error) {
+      throw new Error(`Failed to clean up test sets ${names.join(", ")}: ${error.message}`);
+    }
+
+    if (data?.length === names.length) {
+      return;
+    }
+
+    const removedNames = new Set((data ?? []).map((row) => row.name));
+    const leftoverNames = names.filter((name) => !removedNames.has(name));
+
+    if (leftoverNames.length === 0) {
+      return;
+    }
+
+    const fallbackResult = await supabase.from("sets").delete().in("name", leftoverNames);
+    if (fallbackResult.error) {
+      throw new Error(
+        `Failed to clean up test sets (${leftoverNames.join(", ")}) using fallback strategy: ${fallbackResult.error.message}`
+      );
     }
   },
   trackRating: async ({ supabase }, use) => {
