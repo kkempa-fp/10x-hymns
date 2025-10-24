@@ -15,9 +15,23 @@ const hydrateProcessEnvFromFile = () => {
     return;
   }
 
+  envLoaded = true;
+
   const envUrl = new URL("../../.env.test", import.meta.url);
   const envPath = fileURLToPath(envUrl);
-  const content = readFileSync(envPath, "utf-8");
+
+  let content: string;
+
+  try {
+    content = readFileSync(envPath, "utf-8");
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === "ENOENT") {
+      return; // rely on values injected through the environment
+    }
+
+    throw error;
+  }
 
   content.split(/\r?\n/).forEach((line) => {
     const trimmed = line.trim();
@@ -40,8 +54,6 @@ const hydrateProcessEnvFromFile = () => {
       process.env[key] = value;
     }
   });
-
-  envLoaded = true;
 };
 
 const resolveEnvConfig = (): EnvConfig => {
