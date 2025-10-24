@@ -1,5 +1,10 @@
 name: Pull Request
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 on:
   pull_request:
     types:
@@ -88,7 +93,7 @@ jobs:
       - unit_tests
       - e2e_tests
     runs-on: ubuntu-latest
-    if: ${{ needs.lint.result == 'success' && needs.unit_tests.result == 'success' && needs.e2e_tests.result == 'success' }}
+    if: ${{ needs.lint.result == 'success' && needs.unit_tests.result == 'success' && needs.e2e_tests.result == 'success' && github.event.pull_request.head.repo.owner.login == github.repository_owner }}
     steps:
       - name: Publish status comment
         uses: actions/github-script@v8
