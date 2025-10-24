@@ -2,8 +2,12 @@ const { batchEmbedContentsMock, getGenerativeModelMock, googleClientMock } = vi.
   vi.stubEnv("GOOGLE_API_KEY", "test-key");
 
   const batchEmbedContentsMock = vi.fn();
-  const getGenerativeModelMock = vi.fn(() => ({ batchEmbedContents: batchEmbedContentsMock }));
-  const googleClientMock = vi.fn(() => ({ getGenerativeModel: getGenerativeModelMock }));
+  const getGenerativeModelMock = vi.fn(function () {
+    return { batchEmbedContents: batchEmbedContentsMock };
+  });
+  const googleClientMock = vi.fn(function () {
+    return { getGenerativeModel: getGenerativeModelMock };
+  });
 
   return {
     batchEmbedContentsMock,
@@ -28,8 +32,12 @@ describe("EmbeddingService", () => {
     batchEmbedContentsMock.mockReset();
     getGenerativeModelMock.mockReset();
     googleClientMock.mockReset();
-    getGenerativeModelMock.mockImplementation(() => ({ batchEmbedContents: batchEmbedContentsMock }));
-    googleClientMock.mockImplementation(() => ({ getGenerativeModel: getGenerativeModelMock }));
+    getGenerativeModelMock.mockImplementation(function () {
+      return { batchEmbedContents: batchEmbedContentsMock };
+    });
+    googleClientMock.mockImplementation(function () {
+      return { getGenerativeModel: getGenerativeModelMock };
+    });
   });
 
   afterEach(() => {
