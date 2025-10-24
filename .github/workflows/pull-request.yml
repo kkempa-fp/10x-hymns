@@ -76,7 +76,10 @@ jobs:
           E2E_USERNAME_ID: ${{ secrets.E2E_USERNAME_ID }}
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-        run: npx playwright test --config=playwright.config.ts --reporter=line
+        run: |
+          export PUBLIC_SUPABASE_URL="$SUPABASE_URL"
+          export PUBLIC_SUPABASE_ANON_KEY="$SUPABASE_KEY"
+          npx playwright test --config=playwright.config.ts --reporter=line
 
   status_comment:
     name: Status Comment
