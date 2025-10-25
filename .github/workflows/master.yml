@@ -55,6 +55,11 @@ jobs:
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
         run: npm run build
+      - name: Move client assets to root
+        run: |
+          if [ -d dist/client ]; then
+            cp -r dist/client/* dist/
+          fi
       - name: Deploy with Wrangler
         id: deploy
         uses: cloudflare/wrangler-action@v3
