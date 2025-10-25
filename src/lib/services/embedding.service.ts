@@ -4,6 +4,7 @@ import type {
   EmbedContentRequest,
   TaskType as GeminiTaskType,
 } from "@google/generative-ai";
+import { getEnv } from "astro/env/runtime";
 import { z } from "zod";
 
 import { EMBEDDING_TASK_TYPES } from "../../types";
@@ -65,6 +66,43 @@ export class EmbeddingServiceError extends Error {
  *
  * @requires GOOGLE_API_KEY - This service requires the `GOOGLE_API_KEY` environment variable to be set.
  */
+const resolveRuntimeEnv = (key: string): string | undefined => {
+  try {
+    return getEnv(key);
+  } catch {
+    return undefined;
+  }
+};
+
+const resolveApiKey = (explicit?: string): string | undefined => {
+  if (explicit && explicit.trim()) {
+    return explicit;
+  }
+
+  const runtimeValue = resolveRuntimeEnv("GOOGLE_API_KEY");
+
+  if (runtimeValue && runtimeValue.trim()) {
+    return runtimeValue;
+  }
+
+  const importMetaValue = import.meta.env?.GOOGLE_API_KEY;
+
+  if (importMetaValue && importMetaValue.trim()) {
+    return importMetaValue;
+  }
+
+  const processValue =
+    typeof globalThis.process !== "undefined" && typeof globalThis.process.env?.GOOGLE_API_KEY === "string"
+      ? globalThis.process.env.GOOGLE_API_KEY.trim()
+      : "";
+
+  if (processValue) {
+    return processValue;
+  }
+
+  return undefined;
+};
+
 export class EmbeddingService {
   private readonly generativeAI: GoogleGenerativeAI;
   private readonly model: EmbeddingModel;
@@ -74,12 +112,14 @@ export class EmbeddingService {
    * @param apiKey - The Google API key. Defaults to `import.meta.env.GOOGLE_API_KEY`.
    * @throws {EmbeddingServiceError} If the API key is not provided.
    */
-  constructor(apiKey = import.meta.env.GOOGLE_API_KEY) {
-    if (!apiKey) {
+  constructor(apiKey?: string) {
+    const resolvedKey = resolveApiKey(apiKey);
+
+    if (!resolvedKey) {
       throw new EmbeddingServiceError("Missing GOOGLE_API_KEY environment variable", 500);
     }
 
-    this.generativeAI = new GoogleGenerativeAI(apiKey);
+    this.generativeAI = new GoogleGenerativeAI(resolvedKey);
     this.model = this.generativeAI.getGenerativeModel({ model: EMBEDDING_MODEL_NAME });
   }
 
