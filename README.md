@@ -32,7 +32,7 @@
 **CI/CD / Deployment:**
 
 - GitHub Actions for continuous integration and deployment
-- DigitalOcean for hosting using Docker images
+- Cloudflare Pages as the hosting platform for the Astro application
 
 **Testing:**
 

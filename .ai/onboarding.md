@@ -66,7 +66,7 @@ The project is centered around a sophisticated AI-powered hymn suggestion featur
 
 1.  Who are the main points of contact for different parts of the codebase (e.g., frontend, backend, AI)?
 2.  What is the process for generating and updating hymn embeddings? Is it automated?
-3.  Could you walk me through the CI/CD pipeline and the deployment process to DigitalOcean?
+3.  Could you walk me through the CI/CD pipeline and the deployment process to Cloudflare pages?
 4.  How is the Supabase environment managed for local development versus production?
 5.  Are there any established coding patterns or architectural principles I should be aware of beyond what's in the documentation?
 6.  What are the future plans for the suggestion rating system? How will the feedback be used?

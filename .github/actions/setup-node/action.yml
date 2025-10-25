@@ -1,0 +1,20 @@
+name: Setup Node
+description: Reusable step for preparing Node.js and dependencies
+inputs:
+  node-version:
+    description: Node.js version used for the job
+    required: false
+    default: "20"
+runs:
+  using: composite
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+      shell: bash
