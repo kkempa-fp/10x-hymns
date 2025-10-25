@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { messages } from "@/components/messages";
 import { translateCommonError, translateSuggestionError } from "@/components/messages/translate";
-import { getSupabaseBrowserClient } from "@/db/supabase.client";
+import { getSupabaseBrowserClient, type SupabaseClient } from "@/db/supabase.client";
 import { resolveRequestError } from "@/lib/errors";
 import type {
   GenerateSuggestionsCommand,
@@ -25,7 +25,7 @@ interface SuggestionGeneratorProps {
 }
 
 const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false, user = null }) => {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+  const [supabaseClient, setSupabaseClient] = useState<SupabaseClient | null>(null);
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState<SuggestionDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +39,9 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
     if (typeof window === "undefined") {
       return;
     }
+
+    const client = getSupabaseBrowserClient();
+    setSupabaseClient(client);
 
     const stored = window.localStorage.getItem(FINGERPRINT_STORAGE_KEY);
     if (stored) {
@@ -171,7 +174,12 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
           client_fingerprint: fingerprintValue,
         };
 
-        const { data: sessionData } = await supabase.auth.getSession();
+        const client = supabaseClient ?? getSupabaseBrowserClient();
+        if (!supabaseClient) {
+          setSupabaseClient(client);
+        }
+
+        const { data: sessionData } = await client.auth.getSession();
         const accessToken = sessionData.session?.access_token;
         const headers: Record<string, string> = { "Content-Type": "application/json" };
         if (accessToken) {
@@ -209,7 +217,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
         setRatingLoading(false);
       }
     },
-    [fingerprint, ratingLoading, suggestions, supabase]
+    [fingerprint, ratingLoading, suggestions, supabaseClient]
   );
 
   const isGenerateDisabled = loading || !text.trim();
