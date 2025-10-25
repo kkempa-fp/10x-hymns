@@ -1,4 +1,4 @@
-import { createBrowserClient, createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
+import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 import type { SupabaseClient as SupabaseClientInstance } from "@supabase/supabase-js";
 import type { AstroCookies } from "astro";
 
@@ -56,21 +56,4 @@ export const createSupabaseServerClient = (context: { headers: Headers; cookies:
       },
     },
   });
-};
-
-let browserClient: SupabaseClient | null = null;
-
-const createSupabaseBrowserClient = () => {
-  return createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY, {
-    cookieOptions,
-  });
-};
-
-export const getSupabaseBrowserClient = () => {
-  if (browserClient) {
-    return browserClient;
-  }
-
-  browserClient = createSupabaseBrowserClient();
-  return browserClient;
 };
