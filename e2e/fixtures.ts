@@ -25,7 +25,7 @@ export const test = base.extend<Fixtures>({
     await use(config);
   },
   supabase: async ({ env }, use) => {
-    const client = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_KEY);
+    const client = createClient<Database>(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_KEY);
     await use(client);
   },
   setsPage: async ({ page, env }, use) => {

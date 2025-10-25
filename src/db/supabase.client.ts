@@ -6,34 +6,16 @@ import type { Database } from "../db/database.types.ts";
 
 export type SupabaseClient = SupabaseClientInstance<Database>;
 
-const resolvePublicSupabaseUrl = () => {
-  return import.meta.env.PUBLIC_SUPABASE_URL ?? import.meta.env.SUPABASE_URL;
+const requireEnvVar = (value: string | undefined, name: string) => {
+  if (!value) {
+    throw new Error(`Missing ${name}. Set ${name} in your environment.`);
+  }
+
+  return value;
 };
 
-const resolvePublicSupabaseAnonKey = () => {
-  return import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? import.meta.env.SUPABASE_KEY;
-};
-
-const resolveServerSupabaseUrl = () => {
-  return import.meta.env.SUPABASE_URL ?? import.meta.env.PUBLIC_SUPABASE_URL;
-};
-
-const resolveServerServiceKey = () => {
-  return import.meta.env.SUPABASE_KEY ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-};
-
-const PUBLIC_SUPABASE_URL = resolvePublicSupabaseUrl();
-const PUBLIC_SUPABASE_ANON_KEY = resolvePublicSupabaseAnonKey();
-
-if (!PUBLIC_SUPABASE_URL) {
-  throw new Error("Supabase URL is not configured. Provide SUPABASE_URL or PUBLIC_SUPABASE_URL in your environment.");
-}
-
-if (!PUBLIC_SUPABASE_ANON_KEY) {
-  throw new Error(
-    "Supabase anon key is not configured. Provide SUPABASE_KEY or PUBLIC_SUPABASE_ANON_KEY in your environment."
-  );
-}
+const PUBLIC_SUPABASE_URL = requireEnvVar(import.meta.env.PUBLIC_SUPABASE_URL, "PUBLIC_SUPABASE_URL");
+const PUBLIC_SUPABASE_KEY = requireEnvVar(import.meta.env.PUBLIC_SUPABASE_KEY, "PUBLIC_SUPABASE_KEY");
 
 const cookieOptions: CookieOptionsWithName = {
   name: "sb:token",
@@ -44,9 +26,9 @@ const cookieOptions: CookieOptionsWithName = {
   maxAge: 60 * 60 * 24 * 7,
 };
 
-const parseCookieHeader = (cookieHeader: string | null) => {
+const parseCookieHeader = (cookieHeader: string | null): { name: string; value: string }[] => {
   if (!cookieHeader) {
-    return [] as { name: string; value: string }[];
+    return [];
   }
 
   return cookieHeader.split(";").reduce<{ name: string; value: string }[]>((accumulator, cookie) => {
@@ -61,14 +43,7 @@ const parseCookieHeader = (cookieHeader: string | null) => {
 };
 
 export const createSupabaseServerClient = (context: { headers: Headers; cookies: AstroCookies }) => {
-  const serverUrl = resolveServerSupabaseUrl();
-  const serverKey = resolveServerServiceKey();
-
-  if (!serverUrl || !serverKey) {
-    throw new Error("Supabase server credentials are missing. Configure SUPABASE_URL and SUPABASE_KEY.");
-  }
-
-  return createServerClient<Database>(serverUrl, serverKey, {
+  return createServerClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY, {
     cookieOptions,
     cookies: {
       getAll() {
@@ -86,7 +61,7 @@ export const createSupabaseServerClient = (context: { headers: Headers; cookies:
 let browserClient: SupabaseClient | null = null;
 
 const createSupabaseBrowserClient = () => {
-  return createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+  return createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_KEY, {
     cookieOptions,
   });
 };

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const requiredEnvVars = ["SUPABASE_URL", "SUPABASE_KEY", "E2E_USERNAME_ID", "E2E_USERNAME", "E2E_PASSWORD"] as const;
+const requiredEnvVars = ["PUBLIC_SUPABASE_URL", "PUBLIC_SUPABASE_KEY", "E2E_USERNAME", "E2E_PASSWORD"] as const;
 
 type RequiredEnvKey = (typeof requiredEnvVars)[number];
 
