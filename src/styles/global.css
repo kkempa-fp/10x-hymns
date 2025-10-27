@@ -287,25 +287,44 @@
   .elevation-0 {
     box-shadow: var(--md-sys-elevation-level-0);
   }
-
   .elevation-1 {
     box-shadow: var(--md-sys-elevation-level-1);
   }
-
   .elevation-2 {
     box-shadow: var(--md-sys-elevation-level-2);
   }
-
   .elevation-3 {
     box-shadow: var(--md-sys-elevation-level-3);
   }
-
   .elevation-4 {
     box-shadow: var(--md-sys-elevation-level-4);
   }
-
   .elevation-5 {
     box-shadow: var(--md-sys-elevation-level-5);
+  }
+
+  /* ====================================================================== */
+  /* Autofill fix (Chrome/Safari)                                          */
+  /* ====================================================================== */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px var(--md-sys-color-surface) inset !important;
+    -webkit-text-fill-color: var(--md-sys-color-on-surface) !important;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark textarea:-webkit-autofill,
+  .dark select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px var(--md-sys-color-surface) inset !important;
+    -webkit-text-fill-color: var(--md-sys-color-on-surface) !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
