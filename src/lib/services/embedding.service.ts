@@ -75,29 +75,20 @@ const resolveRuntimeEnv = (key: string): string | undefined => {
 };
 
 const resolveApiKey = (explicit?: string): string | undefined => {
-  if (explicit && explicit.trim()) {
-    return explicit;
-  }
-
-  const runtimeValue = resolveRuntimeEnv("GOOGLE_API_KEY");
-
-  if (runtimeValue && runtimeValue.trim()) {
-    return runtimeValue;
-  }
-
-  const importMetaValue = import.meta.env?.GOOGLE_API_KEY;
-
-  if (importMetaValue && importMetaValue.trim()) {
-    return importMetaValue;
-  }
-
   const processValue =
     typeof globalThis.process !== "undefined" && typeof globalThis.process.env?.GOOGLE_API_KEY === "string"
-      ? globalThis.process.env.GOOGLE_API_KEY.trim()
-      : "";
+      ? globalThis.process.env.GOOGLE_API_KEY
+      : undefined;
 
-  if (processValue) {
-    return processValue;
+  const candidates = [explicit, resolveRuntimeEnv("GOOGLE_API_KEY"), import.meta.env?.GOOGLE_API_KEY, processValue];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string") {
+      const trimmed = candidate.trim();
+      if (trimmed) {
+        return trimmed;
+      }
+    }
   }
 
   return undefined;

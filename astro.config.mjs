@@ -9,11 +9,6 @@ import node from "@astrojs/node";
 import process from "node:process";
 
 const isCloudflare = Boolean(process.env.CF_PAGES);
-const session = isCloudflare
-  ? {
-      driver: "memory",
-    }
-  : undefined;
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,8 +18,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  session,
-  // Decide adapter at runtime so local dev stays on Node while deployment targets Cloudflare.
   adapter: isCloudflare
     ? cloudflare()
     : node({

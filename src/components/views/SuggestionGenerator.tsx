@@ -18,6 +18,33 @@ import type {
 const SUGGESTION_COUNT = 5;
 const FINGERPRINT_STORAGE_KEY = "10x-hymns:fingerprint";
 
+const readFingerprintFromStorage = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return window.localStorage.getItem(FINGERPRINT_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+const writeFingerprintToStorage = (value: string) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(FINGERPRINT_STORAGE_KEY, value);
+  } catch {
+    /* ignore */
+  }
+};
+
+const generateFingerprint = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Date.now().toString(36);
+
 interface SuggestionGeneratorProps {
   authLoading?: boolean;
   user?: User | null;
@@ -34,19 +61,14 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
   const [lastRating, setLastRating] = useState<RatingValue | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const stored = window.localStorage.getItem(FINGERPRINT_STORAGE_KEY);
+    const stored = readFingerprintFromStorage();
     if (stored) {
       setFingerprint(stored);
       return;
     }
 
-    const generated =
-      typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Date.now().toString(36);
-    window.localStorage.setItem(FINGERPRINT_STORAGE_KEY, generated);
+    const generated = generateFingerprint();
+    writeFingerprintToStorage(generated);
     setFingerprint(generated);
   }, []);
 
@@ -76,7 +98,9 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
   };
 
   const handleGenerate = useCallback(async () => {
-    if (!text.trim()) {
+    const trimmedText = text.trim();
+
+    if (!trimmedText) {
       setError(messages.suggestion.requireInput);
       return;
     }
@@ -89,7 +113,7 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
 
     try {
       const payload: GenerateSuggestionsCommand = {
-        text: text.trim(),
+        text: trimmedText,
         count: SUGGESTION_COUNT,
       };
 
@@ -153,10 +177,11 @@ const SuggestionGenerator: FC<SuggestionGeneratorProps> = ({ authLoading = false
         return;
       }
 
-      const fingerprintValue =
-        fingerprint ??
-        (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Date.now().toString(36));
+      const fingerprintValue = fingerprint ?? generateFingerprint();
       setFingerprint(fingerprintValue);
+      if (!fingerprint) {
+        writeFingerprintToStorage(fingerprintValue);
+      }
 
       setRatingLoading(true);
       setStatusMessage(null);

@@ -24,11 +24,24 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+  unit_tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup project
+        uses: ./.github/actions/setup-node
+      - name: Run Vitest
+        run: npm run test:unit
+
   deploy:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     needs:
       - lint
+      - unit_tests
     environment:
       name: production
       url: ${{ steps.deploy.outputs.deployment-url }}
@@ -42,7 +55,6 @@ jobs:
           CF_PAGES: "true"
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: npm run build
       - name: Deploy with Wrangler
         id: deploy
@@ -52,5 +64,3 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=10x-hymns --branch=${{ github.ref_name }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}

@@ -55,9 +55,24 @@ describe("EmbeddingService", () => {
   });
 
   it("throws when instantiated without an API key", () => {
-    expect(() => new EmbeddingService("")).toThrowError(
+    vi.stubEnv("GOOGLE_API_KEY", "");
+
+    expect(() => new EmbeddingService()).toThrowError(
       new EmbeddingServiceError("Missing GOOGLE_API_KEY environment variable", 500)
     );
+
+    vi.stubEnv("GOOGLE_API_KEY", "test-key");
+  });
+
+  it("falls back to runtime environment variable when key is not provided", () => {
+    vi.stubEnv("GOOGLE_API_KEY", "runtime-key");
+
+    const service = new EmbeddingService();
+
+    expect(googleClientMock).toHaveBeenCalledWith("runtime-key");
+    expect(service).toBeInstanceOf(EmbeddingService);
+
+    vi.stubEnv("GOOGLE_API_KEY", "test-key");
   });
 
   it("builds requests and maps trimmed embeddings", async () => {
