@@ -55,6 +55,7 @@ jobs:
           CF_PAGES: "true"
           PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
           PUBLIC_SUPABASE_KEY: ${{ secrets.PUBLIC_SUPABASE_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: npm run build
       - name: Deploy with Wrangler
         id: deploy
