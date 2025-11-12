@@ -1,36 +1,155 @@
-user_id;name;created_at;updated_at;content
-"154a4c83-a29e-425d-9e71-418b433979b9";"16 Niedziela Zwykła (rok C)";"2025-10-22 13:09:40.519453+00";"2025-10-22 13:09:40.519453+00";"We:    Tylko Bóg mi dopomoże         (1-4)   ŚAK-0926
-Pd:    Wszystko Tobie oddać          (1-2)   ŚAK-0633
-Kom:   Pan Jezus już się zbliża      (1-4)   ŚAK-0255
-Uw:    Cały świat niech śpiewa       (1-4)   ŚAK-0295
-Zak:   Jasnogórska Pani, Tyś naszą   (1-3)   ŚAK-0381"
-"154a4c83-a29e-425d-9e71-418b433979b9";"15 Niedziela Zwykła (rok C)";"2025-10-22 13:14:08.338829+00";"2025-10-22 13:14:49.94994+00";"We:    Z dalekiej Fatimy         (1-5)   ŚAK-0464   (UWAGA: 13 lipca)
-Pd:    Wszystko Tobie oddać      (1-2)   ŚAK-0633
-Kom:   O, Panie, Ty nam dajesz   (1-4)   ŚAK-0247
-Uw:    Dzięki, o, Boże Ojcze     (1-3)   ŚAK-0299
-Zak:   Posyłam was na pracę      (1,3)   ŚAK-0837   (UWAGA: kazanie o misjach)"
-"154a4c83-a29e-425d-9e71-418b433979b9";"26 Niedziela Zwykła (rok C)";"2025-10-22 12:57:08.913193+00";"2025-10-22 13:03:42.536241+00";"We:    Boże, w dobroci                 (1-3)   ŚAK-0575
+id,user_id,name,created_at,updated_at,content
+0540abb4-08b8-4374-bbe2-43df2bbb952f,154a4c83-a29e-425d-9e71-418b433979b9,Siódmy Dzień w Oktawie Narodzenia Pańskiego,2025-11-10 11:35:42.613678+00,2025-11-10 11:43:15.519857+00,"We:    Nie tak bystro płynie rzeka      (1-6)   ŚAK-0105.1
+Pd:    Popatrz, jak prędko mija czas    (1-2)   ŚAK-0916
+Kom:   Nie było miejsca                 (1-3)   ŚAK-0073
+Uw:    Triumfy Króla niebieskiego       (1-2)   ŚAK-0092
+Nab:   Pospieszcie już wszyscy          (1-3)   ŚAK-0081
+       Panie, przebacz nam              (1-2)   ŚAK-0611
+       Dzięki, o, Panie                 (1-2)   ŚAK-0300
+       Ciebie, Boga, wysławiamy        (1-14)   ŚAK-0198
+       Podnieś rękę                       (5)   ŚAK-0047
+Zak:   Z narodzenia Pana                (1-2)   ŚAK-0100"
+078232ee-322f-4642-8388-378d9d13780b,154a4c83-a29e-425d-9e71-418b433979b9,27 Niedziela Zwykła (rok C),2025-10-18 13:44:18.314349+00,2025-11-12 10:26:38.013539+00,"We:    Czego chcesz od nas             (1-3)   ŚAK-0297.1
 Pd:    Niechaj z nami będzie Pan       (1-6)   ŚAK-0602
-Kom:   Ja wiem, w kogo ja wierzę       (1-3)   ŚAK-0225
-Uw:    Dziękujemy Ci, Ojcze            (1-3)   ŚAK-0301
-Zak:   Królowej anielskiej śpiewajmy   (1-2)   ŚAK-0385"
-"154a4c83-a29e-425d-9e71-418b433979b9";"Święto Podwyższenia Krzyża Świętego";"2025-10-22 13:06:33.843869+00";"2025-10-22 13:06:33.843869+00";"We:    Krzyżu Chrystusa, bądźże   (1-3)   ŚAK-0132.2
+Kom:   Jeden chleb                     (1-3)   ŚAK-0228
+Uw:    Bądź uwielbiony, miłosierny   (1,2,5)   ŚAK-0566
+Zak:   Zawitaj, Królowo różańca        (1-2)   ŚAK-0468   (UWAGA: październik)"
+16d7e32a-7bd7-4990-861f-58390f95f18a,154a4c83-a29e-425d-9e71-418b433979b9,Święto Podwyższenia Krzyża Świętego,2025-10-22 13:06:33.843869+00,2025-10-22 13:06:33.843869+00,"We:    Krzyżu Chrystusa, bądźże   (1-3)   ŚAK-0132.2
 Pd:    Panie, Ty widzisz          (1-3)   ŚAK-0146
 Kom:   Witam Cię, witam           (1-3)   ŚAK-0288
 Uw:    Upadnij na kolana, ludu    (1-3)   ŚAK-0282
 Zak:   W krzyżu cierpienie        (1-2)   ŚAK-0150"
-"154a4c83-a29e-425d-9e71-418b433979b9";"27 Niedziela Zwykła (rok C)";"2025-10-18 13:44:18.314349+00";"2025-10-22 13:17:02.937569+00";"We:    Czego chcesz od nas           (1-3)     ŚAK-0297.1
-Pd:    Niechaj z nami będzie Pan     (1-6)     ŚAK-0602
-Kom:   Jeden chleb                   (1-3)     ŚAK-0228
-Uw:    Bądź uwielbiony, miłosierny   (1,2,5)   ŚAK-0566
-Zak:   Zawitaj, Królowo różańca      (1-2)     ŚAK-0468     (UWAGA: październik)"
-"154a4c83-a29e-425d-9e71-418b433979b9";"30 Niedziela Zwykła (rok C)";"2025-10-22 12:49:40.784706+00";"2025-10-22 13:17:09.291128+00";"We:    Głoś imię Pana           (1-4)   ŚAK-588
+1966006f-afe0-4f5e-a575-057621c9ca4a,154a4c83-a29e-425d-9e71-418b433979b9,Uroczystość Zmartwychwstania Pańskiego,2025-11-12 09:49:07.703934+00,2025-11-12 10:29:13.963876+00,"We:          Wesoły nam dzień           (1-4,8-9)   ŚAK-0177.2
+Sekwencja:   Niech w święto radosne             -   ŚAK-0167
+Pd:          Nie zna śmierci                (1-5)   ŚAK-0166.1
+Kom:         Alleluja! Żyw już jest         (1-3)   ŚAK-0163
+             Otrzyjcie już łzy              (1-2)   ŚAK-0169
+Uw:          Ciebie, Boże, wielbimy         (1-3)   ŚAK-0199
+Zak:         Raduj się, nieba Królowo       (1-5)   ŚAK-0172.1"
+22f8db61-9cea-43af-a842-99707112e660,154a4c83-a29e-425d-9e71-418b433979b9,Uroczystość Najświętszego Ciała i Krwi Chrystusa (rok C),2025-11-12 10:07:22.074395+00,2025-11-12 10:28:31.161312+00,"We:    Zróbcie Mu miejsce            (1-3)   ŚAK-0293.1
+Pd:    Jeden chleb                   (1-3)   ŚAK-0228
+Kom:   Panie, dobry jak chleb        (1-4)   ŚAK-0258
+Uw:    Dziękujemy Ci, Ojcze      (1,2,5,6)   ŚAK-0301
+Zak:   Niech zawsze i wszędzie        (3x)   ŚAK-0905"
+3490bd21-6fca-4698-b334-178406dc73b1,154a4c83-a29e-425d-9e71-418b433979b9,Uroczystość Świętych Apostołów Piotra i Pawła,2025-11-12 10:10:52.687507+00,2025-11-12 10:28:47.238925+00,"We:    Jeśli chcesz szukać patrona        (1-2)   ŚAK-0502
+Pd:    Boże, obdarz Kościół swój          (1-6)   ŚAK-0574
+Kom:   O, milcząca Hostio biała           (1-2)   ŚAK-0245
+Uw:    Radośnie Panu hymn            (1-2,7-10)   ŚAK-0308
+Zak:   Budujemy Kościół Boży               (3x)   ŚAK-0577"
+372bc281-54c1-4332-ac80-9dc7b9fe6260,154a4c83-a29e-425d-9e71-418b433979b9,04 Niedziela Wielkiego Postu - Lætare (rok C),2025-11-12 09:38:19.101525+00,2025-11-12 09:50:57.982667+00,"We:    Pójdź do Jezusa           (1-2)   ŚAK-0266
+Pd:    Nawróć się, ludu          (1-4)   ŚAK-0116
+Kom:   Wstanę i pójdę            (1-6)   ŚAK-0121
+Uw:    Skosztujcie i zobaczcie   (1-6)   ŚAK-0309
+Zak:   O, głowo, uwieńczona      (1-3)   ŚAK-0139"
+3adb20b8-7e19-45e8-914c-88f384269e0a,154a4c83-a29e-425d-9e71-418b433979b9,30 Niedziela Zwykła (rok C),2025-10-22 12:49:40.784706+00,2025-10-22 13:17:09.291128+00,"We:    Głoś imię Pana           (1-4)   ŚAK-588
 Pd:    Wszystko Tobie oddać     (1-2)   ŚAK-633
 Kom:   Pan zstąpił z nieba      (1-2)   ŚAK-257
 Uw:    Boże, zmiłuj się         (1-4)   ŚAK-294
 Zak:   Zawitaj, Matko różańca   (1-3)   ŚAK-470   (UWAGA: październik)"
-"154a4c83-a29e-425d-9e71-418b433979b9";"18 Niedziela Zwykła (rok C)";"2025-10-22 13:03:33.038453+00";"2025-10-22 13:17:49.213555+00";"We:    Ty, wszechmocny Panie          (1-3)   ŚAK-0625
+49641404-5586-4344-ab09-be91e8dbfa3c,154a4c83-a29e-425d-9e71-418b433979b9,02 Niedziela Zwykła (rok C),2025-11-10 11:50:03.852503+00,2025-11-12 10:13:45.00978+00,"(UWAGA: okres kolędowy)
+
+We:    Bóg się z Panny narodził      (1,2,7)   ŚAK-0048
+Pd:    Mesyjasz przyszedł na świat     (1,6)   ŚAK-0599
+Kom:   Przystąpmy do szopy             (1-2)   ŚAK-0088
+Uw:    Bóg się rodzi                   (1,5)   ŚAK-0047
+Zak:   Narodził się Jezus Chrystus   (1,2,5)   ŚAK-0071"
+4e8320a4-b350-4e22-a6f9-8a0401ce36d6,154a4c83-a29e-425d-9e71-418b433979b9,05 Niedziela Wielkanocna (rok C),2025-11-12 09:57:06.012277+00,2025-11-12 09:58:11.784877+00,"We:    Alleluja! Żyw już jest                       (1-2)   ŚAK-0163
+Pd:    Gdzie miłość wzajemna                        (1-4)   ŚAK-0587
+Kom:   Zwycięzca śmierci                            (1-5)   ŚAK-0181.1
+Uw:    O, Boże, dzięki Ci                           (1-3)   ŚAK-0304
+Zak:   Weź w swą opiekę                             (1-2)   ŚAK-0447
+       (UWAGA: inauguracja pontyfikatu Leona XIV)"
+58c98449-2d1e-42f6-bcc9-d0a092184fa5,154a4c83-a29e-425d-9e71-418b433979b9,16 Niedziela Zwykła (rok C),2025-10-22 13:09:40.519453+00,2025-10-22 13:09:40.519453+00,"We:    Tylko Bóg mi dopomoże         (1-4)   ŚAK-0926
+Pd:    Wszystko Tobie oddać          (1-2)   ŚAK-0633
+Kom:   Pan Jezus już się zbliża      (1-4)   ŚAK-0255
+Uw:    Cały świat niech śpiewa       (1-4)   ŚAK-0295
+Zak:   Jasnogórska Pani, Tyś naszą   (1-3)   ŚAK-0381"
+5b125228-68be-44c6-87a3-4c67ea84e6ce,154a4c83-a29e-425d-9e71-418b433979b9,06 Niedziela Zwykła (rok C),2025-11-10 12:04:57.361137+00,2025-11-10 12:05:20.892779+00,"We:    Za rękę weź mnie, Panie     (1-3)   ŚAK-0637
+Pd:    Gdzie miłość wzajemna       (1-4)   ŚAK-0587
+Kom:   O, Panie, Ty nam dajesz     (1-4)   ŚAK-0247
+Uw:    Dzięki, o, Boże Ojcze       (1-3)   ŚAK-0299
+Zak:   Pozdrawiam Cię, o, Maryjo   (1-3)   ŚAK-0436.1"
+65c57cd0-6b78-41e2-a837-e2eae99b6e78,154a4c83-a29e-425d-9e71-418b433979b9,03 Niedziela Zwykła (rok C),2025-11-10 11:52:34.959303+00,2025-11-12 10:13:55.117822+00,"(UWAGA: okres kolędowy)
+
+We:    Do szopy, hej, pasterze   (1-3)   ŚAK-0054
+Pd:    Pan z nieba i z łona      (1-3)   ŚAK-0077
+Kom:   Przystąpmy do szopy       (1-2)   ŚAK-0088
+Uw:    Z narodzenia Pana         (1,5)   ŚAK-0100
+Zak:   W żłobie leży             (1-3)   ŚAK-0094.2"
+7c21ba47-4f98-49bb-b45b-b56f6e5de734,154a4c83-a29e-425d-9e71-418b433979b9,01 Niedziela Wielkiego Postu (rok C),2025-11-12 09:35:02.382664+00,2025-11-12 09:35:02.382664+00,"We:    Przystąpcie bliżej, grzesznicy   (1-2)   ŚAK-0120
+Pd:    Z rąk kapłańskich                  (2)   ŚAK-0007
+Kom:   Jezu, miłości Twej               (1-3)   ŚAK-0316.1
+Uw:    Upadnij na kolana, ludu          (1-3)   ŚAK-0282
+Zak:   O, Matko miłościwa               (1-5)   ŚAK-0419"
+81618b2e-eeca-4e67-bdb9-e158790fbd83,154a4c83-a29e-425d-9e71-418b433979b9,Wspomnienie Najświętszej Maryi Panny z Lourdes,2025-11-10 12:02:22.512338+00,2025-11-10 12:05:45.752429+00,"We:    Po górach, dolinach          (1-5)   ŚAK-0429
+Pd:    Do Ciebie, Matko, Szafarko   (1-2)   ŚAK-0370
+Kom:   Chrystus Pan karmi           (1-7)   ŚAK-0212
+Uw:    O, Boże, dzięki Ci           (1-3)   ŚAK-0304
+Nab:   Bądźże pozdrowiona           (1-2)   ŚAK-0207
+       Pójdź do Jezusa              (1-2)   ŚAK-0266
+       Przyjdźcie do mnie wszyscy   (1-2)   ŚAK-0231
+       Jezu w Hostii utajony        (1-2)   ŚAK-0231
+       Pobłogosław, Jezu drogi      (1-2)   ŚAK-0328.1
+Zak:   Pod Twój płaszcz             (1-2)   ŚAK-0432"
+8cab74a5-82b9-4333-a47e-498e8dd7c9ca,154a4c83-a29e-425d-9e71-418b433979b9,33 Niedziela Zwykła - Dzień Muzyki Liturgicznej (rok C),2025-11-10 10:32:11.389067+00,2025-11-12 10:23:44.490122+00,"We:    Chrystus, Chrystus to nadzieja         (1-4)   ŚAK-0580
+Pd:    Z rąk kapłańskich                        (2)   ŚAK-0007
+Kom:   Być bliżej Ciebie chcę                 (1-3)   ŚAK-0579
+Uw:    W. Żeleński - Preludium As-dur nr 10       -          -
+       (UWAGA: Dzień Muzyki Liturgicznej) 
+Zak:   Twych, Panie, łask                     (1-2)   ŚAK-0623"
+90374a80-74a8-43e3-9ae8-9ba65e5998ad,154a4c83-a29e-425d-9e71-418b433979b9,02 Niedziela Wielkanocna - Miłosierdzia Bożego (rok C),2025-11-12 09:49:56.034591+00,2025-11-12 09:53:22.038593+00,"We:    Alleluja! Biją dzwony                (1-4)   ŚAK-0158
+Pd:    Miłosierdziem Twoim, Panie           (1-3)   ŚAK-0567
+Kom:   Zbliżam się w pokorze                (1-6)   ŚAK-0292
+Uw:    Bądź uwielbiony, miłosierny Boże   (1,2,5)   ŚAK-0566
+Zak:   Wesel się, Królowo miła              (1-2)   ŚAK-0174.1"
+91a6ec72-8af0-4dca-b43c-4819a245e3a0,154a4c83-a29e-425d-9e71-418b433979b9,Uroczystość Objawienia Pańskiego,2025-11-10 11:46:39.077861+00,2025-11-10 11:46:39.077861+00,"We:    Mędrcy świata, monarchowie   (1-4)   ŚAK-0107
+Pd:    Jakaż to gwiazda błyszczy    (1-3)   ŚAK-0106
+Kom:   O, gwiazdo betlejemska       (1-3)   ŚAK-0075
+Uw:    Jezusa narodzonego           (1-4)   ŚAK-0064
+Zak:   Pasterze bieżeli             (1-3)   ŚAK-0078"
+979c91fc-a225-4c5d-8766-fbaed5442e39,154a4c83-a29e-425d-9e71-418b433979b9,Święto Ofiarowania Pańskiego,2025-11-10 11:56:01.904102+00,2025-11-10 11:56:01.904102+00,"Procesja:   Światło na oświecenie                 (1-5)   ŚAK-0622
+We:         Gdy się Chrystus rodzi                (1-2)   ŚAK-0058
+Pd:         Triumfy Króla niebieskiego            (2-3)   ŚAK-0092
+Kom:        Wesołą nowinę, bracia, słuchajcie   (1,3,4)   ŚAK-0096
+Uw:         Mizerna, cicha                      (1,3,4)   ŚAK-0069.2
+Zak:        Bóg się rodzi                       (1,2,5)   ŚAK-0047"
+97e8ea61-9214-44fd-971d-bc2967518550,154a4c83-a29e-425d-9e71-418b433979b9,Uroczystość Zesłania Ducha Świętego,2025-11-12 09:58:59.087275+00,2025-11-12 10:28:59.255335+00,"We:          Przybądź, Duchu Stworzycielu   (1-7)   ŚAK-0195
+Sekwencja:   Przybądź, Duchu Święty         (1-4)   ŚAK-0196.1
+Pd:          Idźcie na cały świat           (4-5)   ŚAK-0590
+Kom:         Pamiątkę dnia świątecznego     (1-4)   ŚAK-0193
+Uw:          Ojcze, chwała Tobie            (1-3)   ŚAK-0605
+Zak:         O, Duchu Święty, Boże           (3x)   ŚAK-0190"
+a05cd056-5da5-4dee-923b-81e3b35f48a7,154a4c83-a29e-425d-9e71-418b433979b9,18 Niedziela Zwykła (rok C),2025-10-22 13:03:33.038453+00,2025-10-22 13:17:49.213555+00,"We:    Ty, wszechmocny Panie          (1-3)   ŚAK-0625
 Pd:    Twych, Panie, łask             (1-2)   ŚAK-0623
 Kom:   Jam jest Chleb Życia           (1-3)   ŚAK-0226
 Uw:    Dziękczynne pieśni śpiewajmy   (1-3)   ŚAK-0298
 Zak:   Z dawna Polski Tyś Królową     (1-2)   ŚAK-0465   (UWAGA: sierpień)"
+b1488d98-1c58-4891-a2ac-b52b378f5715,154a4c83-a29e-425d-9e71-418b433979b9,26 Niedziela Zwykła (rok C),2025-10-22 12:57:08.913193+00,2025-10-22 13:03:42.536241+00,"We:    Boże, w dobroci                 (1-3)   ŚAK-0575
+Pd:    Niechaj z nami będzie Pan       (1-6)   ŚAK-0602
+Kom:   Ja wiem, w kogo ja wierzę       (1-3)   ŚAK-0225
+Uw:    Dziękujemy Ci, Ojcze            (1-3)   ŚAK-0301
+Zak:   Królowej anielskiej śpiewajmy   (1-2)   ŚAK-0385"
+b24b49f2-a0ea-445a-a361-4b52e98c1982,154a4c83-a29e-425d-9e71-418b433979b9,15 Niedziela Zwykła (rok C),2025-10-22 13:14:08.338829+00,2025-10-22 13:14:49.94994+00,"We:    Z dalekiej Fatimy         (1-5)   ŚAK-0464   (UWAGA: 13 lipca)
+Pd:    Wszystko Tobie oddać      (1-2)   ŚAK-0633
+Kom:   O, Panie, Ty nam dajesz   (1-4)   ŚAK-0247
+Uw:    Dzięki, o, Boże Ojcze     (1-3)   ŚAK-0299
+Zak:   Posyłam was na pracę      (1,3)   ŚAK-0837   (UWAGA: kazanie o misjach)"
+c09ff849-df2c-4661-9568-f41d46d0445a,154a4c83-a29e-425d-9e71-418b433979b9,Wielki Czwartek,2025-11-12 09:45:25.037552+00,2025-11-12 09:45:25.037552+00,"We:         A myśmy się chlubić powinni     (ref)   ŚAK-0757
+            W krzyżu cierpienie             (1-4)   ŚAK-0150
+Mandatum:   Przykazanie nowe daję wam       (1-7)   ŚAK-0617.1
+Pd:         Gdzie miłość wzajemna           (1-4)   ŚAK-0587
+            Jeden chleb                     (1-2)   ŚAK-0228
+Kom:        Pan wieczernik przygotował      (1-6)   ŚAK-0256
+            Kiedy razem się schodzimy       (1-3)   ŚAK-0236
+            To Ty, o, Panie                 (1-2)   ŚAK-0276
+            Jezusa ukrytego                 (1,3)   ŚAK-0233
+Uw:         Dziękujemy Ci, Ojcze            (1-8)   ŚAK-0301
+Procesja:   Sław, języku, tajemnicę         (1-4)   ŚAK-0274
+            Przed tak wielkim Sakramentem   (1-2)   ŚAK-0269.2"
+cb28d4d1-1b10-4c87-a5a3-04a2f3b7b493,154a4c83-a29e-425d-9e71-418b433979b9,Środa Popielcowa,2025-11-12 09:32:46.953523+00,2025-11-12 10:27:43.238352+00,"We:          Bądź mi litościw              (1-6)   ŚAK-0109
+Posypanie:   Bliskie jest królestwo Boże   (1-8)   ŚAK-0110
+             Posypmy głowy popiołem        (1-6)   ŚAK-0118
+Pd:          Panie, przebacz nam           (1-2)   ŚAK-0611
+Kom:         Witam Cię, witam              (1-3)   ŚAK-0288
+Uw:          Duszo Chrystusowa                 -   ŚAK-0220
+Zak:         Z tej biednej ziemi           (1-2)   ŚAK-0336"
